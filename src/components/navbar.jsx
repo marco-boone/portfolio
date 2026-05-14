@@ -5,8 +5,10 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
-    { name: "home", href: "/" },
-    { name: "math215", href: "/si" },
+    { name: "/home", href: "/" },
+    { name: "~/projects", href: "/projects" },
+    { name: "~/si/math215", href: "/si" },
+    
   ];
 
   return (
