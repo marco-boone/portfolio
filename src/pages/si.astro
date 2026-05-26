@@ -1,42 +1,65 @@
 ---
 import Layout from "../layouts/layout.astro";
-import "../styles/global.css";
-import ExperienceSection from "../components/index/s_experience";
+import PageShell from "../components/PageShell.astro";
+import PageSection from "../components/PageSection.astro";
 ---
 
-<Layout title="Portfolio">
-  <div
-    class="flex flex-col items-center bg-crust text-text text-sm font-mono min-h-screen p-6"
-  >
-    <div class="h-16"></div>
-    <!-- Terminal Body -->
-    <div class="w-[90vw] md:w-[60vw] rounded-b text-sm text-text">
-      <div class="text-xl md:text-2xl font-bold text-primary py-4">
-        ~/si/math215
+<Layout title="SI — Math 215">
+  <PageShell>
+    <PageSection path="~/si/math215">
+      <div class="flex flex-col gap-8 text-subtext0">
+        <dl class="grid gap-2 sm:grid-cols-[5rem_1fr]">
+          <dt class="font-semibold text-text">when</dt>
+          <dd>Sunday from 1:00pm to 2:30pm</dd>
+          <dt class="font-semibold text-text">where</dt>
+          <dd>1372 East Hall — Central Campus</dd>
+        </dl>
+
+        <section class="flex flex-col gap-2">
+          <h2 class="font-semibold text-text">session material</h2>
+          <p>new material coming soon for F2026</p>
+        </section>
+
+        <section class="flex flex-col gap-2">
+          <h2 class="font-semibold text-text">session solutions</h2>
+          <a
+            class="link-accent w-fit"
+            href="https://drive.google.com/drive/folders/12Pt0F6Cl5k8LezmfKdS41UT9HTURTZ5k?usp=sharing"
+          >
+            g_drive
+          </a>
+        </section>
+
+        <section class="flex flex-col gap-2">
+          <h2 class="font-semibold text-text">compiled resources</h2>
+          <ul class="flex flex-col gap-1.5 pl-1">
+            <li>
+              <a class="link-accent" href="https://math.arizona.edu/~serinh/teaching/math215.html">notes by serin</a>
+            </li>
+            <li>
+              <a class="link-accent" href="https://tutorial.math.lamar.edu/classes/calciii/calciii.aspx">notes by paul</a>
+            </li>
+            <li>
+              <a class="link-accent" href="https://youtube.com/playlist?list=PL4C4C8A7D06566F38&si=SiuVBuEmhcdBW5SI">MIT lectures</a>
+            </li>
+            <li>
+              <a class="link-accent" href="https://dept.math.lsa.umich.edu/courses/215/17exampractice/index.html">previous exams</a>
+            </li>
+            <li>
+              <a class="link-accent" href="https://www.khanacademy.org/math/multivariable-calculus">Khan Academy</a>
+            </li>
+            <li>
+              <a class="link-accent" href="https://lsa.umich.edu/math/undergraduates/course-resources/math-lab.html">math lab</a>
+            </li>
+            <li>
+              <a class="link-accent" href="https://ecas.engin.umich.edu/elc/tutoring/">tutoring</a>
+            </li>
+            <li>
+              <a class="link-accent" href="https://ecas.engin.umich.edu/elc-si-schedule/">SI schedule</a>
+            </li>
+          </ul>
+        </section>
       </div>
-      <div
-        class="bg-base rounded-sm flex flex-col gap-2 p-4 border border-gray-700 hover:border-primary/50 transition-colors"
-      >
-      <span><span class = "font-bold">when</span>: Sunday from 1:00pm to 2:30pm</span>
-      <span><span class = "font-bold">where</span>: 1372 East Hall - Central Campus</span>
-      <span>---</span>
-      <span class = "font-bold">session material: </span>
-      <span>new material coming soon for F2026</span>
-      <span>---</span>
-       <span class = "font-bold">session solutions: </span>
-      <a class = "text-blue" href="https://drive.google.com/drive/folders/12Pt0F6Cl5k8LezmfKdS41UT9HTURTZ5k?usp=sharing" download>g_drive</a>
-      <span>---</span>
-      <span class = "font-bold">complied resources:</span>
-      <a class = "text-blue" href="https://math.arizona.edu/~serinh/teaching/math215.html">notes by serin</a>
-      <a class = "text-blue" href="https://tutorial.math.lamar.edu/classes/calciii/calciii.aspx">notes by paul</a>
-      <a class = "text-blue" href="https://youtube.com/playlist?list=PL4C4C8A7D06566F38&si=SiuVBuEmhcdBW5SI">MIT lectures</a>
-      <a class = "text-blue" href="https://dept.math.lsa.umich.edu/courses/215/17exampractice/index.html">previous exams</a>
-      <a class = "text-blue" href="https://www.khanacademy.org/math/multivariable-calculus">Khan Academy</a>
-      <a class = "text-blue" href="https://lsa.umich.edu/math/undergraduates/course-resources/math-lab.html">math lab</a>
-      <a class = "text-blue" href="https://ecas.engin.umich.edu/elc/tutoring/">tutoring</a>
-      <a class = "text-blue" href="https://ecas.engin.umich.edu/elc-si-schedule/">SI schedule</a>
-      
-      </div>
-    </div>
-  </div>
+    </PageSection>
+  </PageShell>
 </Layout>

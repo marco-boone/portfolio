@@ -20,7 +20,7 @@ export default function TreeDisplay() {
           {i === projects.length - 1 ? "│   └── " : "│   ├── "}
           <a
             href={project.link}
-            className="text-green-500 hover:text-blue-400 underline"
+            className="text-green hover:text-blue underline"
           >
             {project.name}
           </a>

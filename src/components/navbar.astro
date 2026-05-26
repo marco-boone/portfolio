@@ -1,0 +1,35 @@
+---
+const navItems = [
+  { name: "/home", href: "/" },
+  { name: "~/projects", href: "/projects" },
+  { name: "~/si/math215", href: "/si" },
+  { name: "~/experience", href: "/experience" },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<nav class="sticky top-0 z-50 bg-crust">
+  <div class="content-column flex h-14 items-center gap-6 sm:gap-8">
+    {
+      navItems.map((item) => {
+        const isActive =
+          item.href === "/"
+            ? currentPath === "/"
+            : currentPath.startsWith(item.href);
+
+        return (
+          <a
+            href={item.href}
+            class:list={[
+              "text-xs sm:text-sm transition-colors duration-150",
+              isActive ? "text-blue" : "text-subtext0 hover:text-text",
+            ]}
+          >
+            {item.name}
+          </a>
+        );
+      })
+    }
+  </div>
+</nav>

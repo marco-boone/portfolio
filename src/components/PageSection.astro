@@ -1,0 +1,13 @@
+---
+interface Props {
+  path?: string;
+  class?: string;
+}
+
+const { path, class: className = "" } = Astro.props;
+---
+
+<section class:list={["flex flex-col gap-4", className]}>
+  {path && <p class="text-subtext0 text-xs">{path}</p>}
+  <slot />
+</section>

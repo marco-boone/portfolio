@@ -1,5 +1,8 @@
 ---
-import Navbar from "../components/navbar.jsx";
+import Navbar from "../components/navbar.astro";
+import "../styles/global.css";
+
+const { title } = Astro.props;
 ---
 
 <html lang="en">
@@ -8,11 +11,11 @@ import Navbar from "../components/navbar.jsx";
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <title>{Astro.props.title}</title>
+    <title>{title}</title>
   </head>
-  <body class="bg-crust">
-    <Navbar client:load />
-    <main>
+  <body>
+    <Navbar />
+    <main class="pb-8">
       <slot />
     </main>
   </body>

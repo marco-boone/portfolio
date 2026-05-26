@@ -2,11 +2,41 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+@layer base {
+  html {
+    @apply antialiased scroll-smooth;
+  }
+
+  body {
+    @apply bg-crust text-text font-mono text-sm leading-relaxed;
+  }
+
+  ::selection {
+    background-color: rgb(69 129 235 / 0.35);
+    color: #eeeeee;
+  }
+}
+
+@layer components {
+  .content-column {
+    @apply mx-auto w-full max-w-xl px-5 sm:px-6;
+  }
+
+  .link-accent {
+    @apply text-blue underline decoration-blue/30 underline-offset-2 transition-colors hover:text-lavender hover:decoration-lavender/50;
+  }
+
+  .section-label {
+    @apply text-subtext0 text-xs uppercase tracking-wider;
+  }
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
+
 .animate-spin {
   animation: spin 3s linear infinite;
 }

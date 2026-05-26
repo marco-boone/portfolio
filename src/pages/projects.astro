@@ -1,40 +1,52 @@
 ---
 import Layout from "../layouts/layout.astro";
-import "../styles/global.css";
-import ExperienceSection from "../components/index/s_experience";
+import PageShell from "../components/PageShell.astro";
+import PageSection from "../components/PageSection.astro";
 ---
 
-<Layout title="Portfolio">
-  <div
-    class="flex flex-col items-center bg-crust text-text text-sm font-mono min-h-screen p-6"
-  >
-    <div class="h-16"></div>
-    <!-- Terminal Body -->
-    <div class="w-[90vw] md:w-[60vw] rounded-b text-sm text-text">
-      <div class="text-xl md:text-2xl font-bold text-primary py-4">
-        ~/projects
+<Layout title="Projects">
+  <PageShell>
+    <PageSection path="~/projects">
+      <div class="flex flex-col gap-8">
+        <section class="flex flex-col gap-2">
+          <h2 class="section-label">Personal</h2>
+          <ul class="flex flex-col gap-1.5 pl-1">
+            <li>
+              <a class="link-accent" href="https://github.com/marco-boone/chat-room">chat-room</a>
+            </li>
+            <li>
+              <a class="link-accent" href="https://github.com/marco-boone/wordle-clone">wordle</a>
+            </li>
+            <li>
+              <a class="link-accent" href="https://github.com/marco-boone/boids">boids</a>
+            </li>
+            <li>
+              <a class="link-accent" href="https://github.com/marco-boone/gravity">gravity</a>
+            </li>
+          </ul>
+        </section>
+
+        <section class="flex flex-col gap-2">
+          <h2 class="section-label">Career</h2>
+          <ul class="flex flex-col gap-1.5 pl-1">
+            <li>
+              <a class="link-accent" href="https://github.com/marco-boone/3DPrintingPlatformer">platformer</a>
+            </li>
+          </ul>
+        </section>
+
+        <section class="flex flex-col gap-2">
+          <h2 class="section-label">Course</h2>
+          <ul class="flex flex-col gap-1.5 pl-1">
+            <li>
+              <a class="link-accent" href="https://github.com/marco-boone/">LC2K CPU</a>
+            </li>
+            <li>
+              <a class="link-accent" href="https://github.com/marco-boone/373fp">MiMU Glove</a>
+            </li>
+          </ul>
+        </section>
       </div>
-      <div
-        class="bg-base rounded-sm flex flex-col gap-2 p-4 border border-gray-700 hover:border-primary/50 transition-colors"
-      >
-      <span class = "font-bold">Personal Projects</span>
-      <div class = "px-4 flex flex-col gap-1">
-      <a class = "text-blue" href="https://github.com/marco-boone/chat-room" >chat-room</a>
-      <a class = "text-blue" href="https://github.com/marco-boone/wordle-clone" >wordle</a>
-      <a class = "text-blue" href="https://github.com/marco-boone/boids" >boids</a>
-      <a class = "text-blue" href="https://github.com/marco-boone/gravity" >gravity</a>
-      </div>
-      <span class = "font-bold">Career Projects</span>
-      <div class = "px-4 flex flex-col gap-1">
-      <a class = "text-blue" href="https://github.com/marco-boone/3DPrintingPlatformer" >platformer</a>
-      </div>
-      <span class = "font-bold">Course Projects</span>
-      <div class = "px-4 flex flex-col gap-1">
-      <a class = "text-blue" href="https://github.com/marco-boone/" >LC2K CPU</a>
-      <a class = "text-blue" href="https://github.com/marco-boone/373fp" >MiMU Glove</a>
-      </div>
-       
-      </div>
-    </div>
-  </div>
+    </PageSection>
+  </PageShell>
 </Layout>

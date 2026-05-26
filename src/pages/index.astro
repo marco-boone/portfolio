@@ -1,48 +1,38 @@
 ---
 import Layout from "../layouts/layout.astro";
-import "../styles/global.css";
-import TreeDisplay from "../components/tree";
+import PageShell from "../components/PageShell.astro";
+import PageSection from "../components/PageSection.astro";
 import Links from "../components/index/s_links";
-import { GrLocationPin } from "react-icons/gr";
 ---
 
 <Layout title="Portfolio">
-  <div
-    class="flex justify-center items-center bg-crust text-text text-sm font-mono min-h-screen p-6"
-  >
-    <!-- Terminal Body -->
-    <div
-      class="grid gap-4 grid-cols-1 lg:grid-cols-3 lg:grid-rows-4 w-[90vw] lg:w-[60vw] rounded-b text-sm text-text"
-    >
-      <div
-        class="col-span-1 row-span-1 lg:col-span-2 lg:row-span-3 flex flex-col justify-between gap-4 bg-mantle p-10 shadow-sm shadow-rosewater"
-      >
-        <div class="flex flex-col gap-4">
-          <h1 class="text-2xl lg:text-5xl font-bold">hello, i'm marco</h1>
-          <div class="lg:col-span-4">
-            21yo <span class="text-blue">computer engineering </span>student at <span
-              class="text-blue">U</span
-            >of<span class="text-yellow">M</span>
-          </div>
+  <PageShell class="flex flex-col gap-12">
+    <PageSection>
+      <div class="flex flex-col gap-5">
+        <div class="flex flex-col gap-3">
+          <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-text">
+            hello, i'm marco
+          </h1>
+          <p class="text-subtext0">
+            21yo <span class="text-blue">computer engineering</span> student at
+            <span class="text-blue">U</span>of<span class="text-yellow">M</span>
+          </p>
         </div>
-
-        <Links />
+        <Links client:load />
       </div>
-      <div
-        class="p-10 bg-mantle row-span-1 col-span-1 lg:row-span-3 flex flex-col gap-4 shadow-sm shadow-rosewater"
-      >
-        <div class="flex gap-4 items-center font-semibold">
-          <span
-            class="w-12 aspect-square p-2 bg-mantle flex justify-center items-center rounded-full shadow-sm shadow-pink"
-            ><span class="font-bold text-xl">MB</span></span
-          >
-          <GrLocationPin /> Ann Arbor, MI
+    </PageSection>
+
+    <PageSection path="~/about">
+      <div class="flex flex-col gap-4">
+        <div class="flex items-center gap-3 text-subtext1">
+          <span class="text-sm font-bold text-text">MB</span>
+          <span class="text-subtext0">Ann Arbor, MI</span>
         </div>
-        <p class="leading-6">
-          I am interested in computer architecture, embedded systems, operating systems, and math. 
+        <p class="text-subtext0">
+          I am interested in computer architecture, embedded systems, operating
+          systems, and math.
         </p>
       </div>
-
-    </div>
-  </div>
+    </PageSection>
+  </PageShell>
 </Layout>
