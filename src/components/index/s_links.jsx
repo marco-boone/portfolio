@@ -7,14 +7,14 @@ export default function Links() {
     <div className="flex gap-3 pt-2">
       <a
         href="https://github.com/marco-boone"
-        className="text-subtext0 transition-colors hover:text-blue"
+        className="text-base text-text transition-colors hover:text-blue"
         aria-label="GitHub"
       >
         <FaGithub />
       </a>
       <a
         href="https://www.linkedin.com/in/marco-boone-220200262/"
-        className="text-subtext0 transition-colors hover:text-blue"
+        className="text-base text-text transition-colors hover:text-blue"
         aria-label="LinkedIn"
       >
         <FaLinkedin />
