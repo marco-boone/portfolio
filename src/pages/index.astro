@@ -1,38 +1,29 @@
 ---
 import Layout from "../layouts/layout.astro";
 import PageShell from "../components/PageShell.astro";
-import PageSection from "../components/PageSection.astro";
 import Links from "../components/index/s_links";
 ---
 
 <Layout title="Portfolio">
-  <PageShell class="flex flex-col gap-12">
-    <PageSection>
-      <div class="flex flex-col gap-5">
-        <div class="flex flex-col gap-3">
-          <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-text">
-            hello, i'm marco
-          </h1>
-          <p class="text-subtext0">
-            21yo <span class="text-blue">computer engineering</span> student at
-            <span class="text-blue">U</span>of<span class="text-yellow">M</span>
-          </p>
-        </div>
-        <Links client:load />
-      </div>
-    </PageSection>
+  <PageShell>
+    <div class="flex flex-col gap-4">
+      <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-text">
+        hello, i'm marco
+      </h1>
 
-    <PageSection path="~/about">
-      <div class="flex flex-col gap-4">
-        <div class="flex items-center gap-3 text-subtext1">
-          <span class="text-sm font-bold text-text">MB</span>
-          <span class="text-subtext0">Ann Arbor, MI</span>
-        </div>
-        <p class="text-subtext0">
-          I am interested in computer architecture, embedded systems, operating
-          systems, and math.
-        </p>
-      </div>
-    </PageSection>
+      <p class="text-subtext0">
+        21yo <span class="text-blue">computer engineering</span> student at
+        <span class="text-blue">U</span>of<span class="text-yellow">M</span>
+      </p>
+
+      <p class="text-subtext0">Ann Arbor, MI</p>
+
+      <p class="text-subtext0">
+        I am interested in computer architecture, embedded systems, operating
+        systems, and math.
+      </p>
+
+      <Links client:load />
+    </div>
   </PageShell>
 </Layout>
