@@ -10,39 +10,64 @@ import PageSection from "../components/PageSection.astro";
       <div class="flex flex-col gap-8">
         <section class="flex flex-col gap-2">
           <h2 class="section-label">Personal</h2>
-          <ul class="flex flex-col gap-1.5 pl-1">
-            <li>
-              <a class="link-accent" href="https://github.com/marco-boone/chat-room">chat-room</a>
+          <ul class="flex flex-col gap-3 pl-1">
+            <li class="flex flex-col gap-0.5">
+              <a class="link-accent" href="https://github.com/marcoboone/Atombots_Simulation_ML_GA">neural network from scratch</a>
+              <p class="text-subtext0">
+                Implemented a feedforward neural network from scratch in C# — custom layer/matrix math, sigmoid
+                activation, and forward propagation with no ML libraries — then paired it with a genetic algorithm
+                that mutates weights and biases each generation to train simulated swarm robots in Unity.
+              </p>
             </li>
-            <li>
-              <a class="link-accent" href="https://github.com/marco-boone/wordle-clone">wordle</a>
-            </li>
-            <li>
-              <a class="link-accent" href="https://github.com/marco-boone/boids">boids</a>
-            </li>
-            <li>
-              <a class="link-accent" href="https://github.com/marco-boone/gravity">gravity</a>
+            <li class="flex flex-col gap-0.5">
+              <div class="flex items-center gap-2">
+                <a class="link-accent" href="https://github.com/marco-boone/minventory">minventory</a>
+                <span class="text-overlay1 text-[10px] uppercase tracking-wider border border-overlay0 rounded px-1.5 py-0.5">private</span>
+              </div>
+              <p class="text-subtext0">
+                A Next.js/TypeScript app backed by Prisma and Supabase that tracks everyday purchases (food, soap,
+                toothpaste, replacements) to compute survival spend per day, week, month, and year; deployed in
+                invite-only alpha.
+              </p>
             </li>
           </ul>
         </section>
 
         <section class="flex flex-col gap-2">
           <h2 class="section-label">Career</h2>
-          <ul class="flex flex-col gap-1.5 pl-1">
-            <li>
+          <ul class="flex flex-col gap-3 pl-1">
+            <li class="flex flex-col gap-0.5">
               <a class="link-accent" href="https://github.com/marco-boone/3DPrintingPlatformer">platformer</a>
+              <p class="text-subtext0">
+                Developed and shipped a 2D platformer in Unity (C#) themed around 3D printing concepts for the S2A
+                Research Lab, implementing physics-based mechanics like coyote time and responsive jump; demoed to
+                the lab team and at the SURE Symposium.
+              </p>
             </li>
           </ul>
         </section>
 
         <section class="flex flex-col gap-2">
           <h2 class="section-label">Course</h2>
-          <ul class="flex flex-col gap-1.5 pl-1">
-            <li>
-              <a class="link-accent" href="https://github.com/marco-boone/">LC2K CPU</a>
+          <ul class="flex flex-col gap-3 pl-1">
+            <li class="flex flex-col gap-0.5">
+              <div class="flex items-center gap-2">
+                <a class="link-accent" href="https://github.com/marco-boone/">LC2K CPU</a>
+                <span class="text-overlay1 text-[10px] uppercase tracking-wider border border-overlay0 rounded px-1.5 py-0.5">private</span>
+              </div>
+              <p class="text-subtext0">
+                Designed and synthesized a pipelined LC2K processor in SystemVerilog with an out-of-order micro-op
+                queue, banked BTB, and direct-mapped Icache, achieving 1.6 CPI and 18.9 ns per instruction across the
+                full test suite for a top-5 class ranking.
+              </p>
             </li>
-            <li>
+            <li class="flex flex-col gap-0.5">
               <a class="link-accent" href="https://github.com/marco-boone/373fp">MiMU Glove</a>
+              <p class="text-subtext0">
+                Built bare-metal C firmware on an STM32 ARM Cortex-M4 (no RTOS) integrating 6+ peripherals over SPI,
+                I2C, and UART for wireless gesture-controlled audio recording and playback, with an interrupt-driven
+                gesture recognition pipeline mapping sensor input to audio events.
+              </p>
             </li>
           </ul>
         </section>
