@@ -1,0 +1,34 @@
+---
+import Layout from "../layouts/layout.astro";
+import PageShell from "../components/PageShell.astro";
+import PageSection from "../components/PageSection.astro";
+
+const quotes = [
+  {
+    text: "Anyone can perform magic, anyone can reach his goals if he can think, if he can wait, if he can fast.",
+    author: "Siddhartha",
+    source: "Siddhartha by Hermann Hesse",
+  },
+];
+---
+
+<Layout title="Quotes">
+  <PageShell>
+    <PageSection path="~/quotes">
+      <ul class="flex flex-col gap-6">
+        {
+          quotes.map((quote) => (
+            <li>
+              <blockquote class="border-l-2 border-overlay0 pl-4 text-text">
+                “{quote.text}”
+              </blockquote>
+              <p class="mt-2 pl-4 text-sm text-subtext0">
+                — {quote.author}{quote.source && `, ${quote.source}`}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </PageSection>
+  </PageShell>
+</Layout>
