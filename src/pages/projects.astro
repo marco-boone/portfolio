@@ -2,6 +2,7 @@
 import Layout from "../layouts/layout.astro";
 import PageShell from "../components/PageShell.astro";
 import PageSection from "../components/PageSection.astro";
+import FeaturedProject from "../components/FeaturedProject.astro";
 ---
 
 <Layout title="Projects">
@@ -9,13 +10,36 @@ import PageSection from "../components/PageSection.astro";
     <PageSection path="~/projects">
       <div class="flex flex-col gap-8">
         <section class="flex flex-col gap-2">
+          <h2 class="section-label">Featured</h2>
+          <ul class="flex flex-col gap-3">
+            <FeaturedProject
+              title="OoO RISC-V CPU"
+              href="/projects/ooo-cpu"
+              github="https://github.com/marco-boone/"
+              private
+              blurb="2-wide superscalar, out-of-order RISC-V core in SystemVerilog, modeled on the MIPS R10K. EECS 472 team project."
+              tags={["SystemVerilog", "computer architecture", "team of 4"]}
+            />
+            <FeaturedProject
+              title="MiMU Glove"
+              href="/projects/mimu-glove"
+              github="https://github.com/marco-boone/373fp"
+              blurb="Wireless gesture-controlled audio recorder/player glove, bare-metal C on an STM32 (Cortex-M4)."
+              tags={["C", "STM32", "embedded"]}
+            />
+            <FeaturedProject
+              title="Neural Network from Scratch"
+              href="/projects/neural-network"
+              github="https://github.com/marcoboone/Atombots_Simulation_ML_GA"
+              blurb="Neural network written from scratch in C#, trained with a genetic algorithm to control swarm robots in Unity."
+              tags={["C#", "Unity", "machine learning"]}
+            />
+          </ul>
+        </section>
+
+        <section class="flex flex-col gap-2">
           <h2 class="section-label">Course</h2>
           <ul class="flex flex-col gap-3 pl-1">
-            <li class="flex flex-col gap-0.5">
-              <span class="text-text">OoO RISC-V CPU</span>
-              <p class="text-subtext0">2-wide superscalar, out-of-order RISC-V core in SystemVerilog, modeled on the MIPS R10K. EECS 472 team project.</p>
-              <a class="link-accent w-fit" href="/mde_slides">slide deck</a>
-            </li>
             <li class="flex flex-col gap-0.5">
               <div class="flex items-center gap-2">
                 <a class="link-accent" href="https://github.com/marco-boone/">LC2K CPU</a>
@@ -27,14 +51,6 @@ import PageSection from "../components/PageSection.astro";
                 <li>Bimodal branch prediction with banked BTB</li>
                 <li>Direct-mapped I-cache</li>
                 <li>1.6 CPI, 18.9 ns per instruction</li>
-              </ul>
-            </li>
-            <li class="flex flex-col gap-0.5">
-              <a class="link-accent" href="https://github.com/marco-boone/373fp">MiMU Glove</a>
-              <p class="text-subtext0">Wireless gesture-controlled audio recorder/player glove, bare-metal C on an STM32 (Cortex-M4).</p>
-              <ul class="text-subtext0 list-disc pl-5">
-                <li>No RTOS, 6+ peripherals over SPI, I2C, and UART</li>
-                <li>Interrupt-driven gesture recognition</li>
               </ul>
             </li>
           </ul>
@@ -53,14 +69,6 @@ import PageSection from "../components/PageSection.astro";
         <section class="flex flex-col gap-2">
           <h2 class="section-label">Personal</h2>
           <ul class="flex flex-col gap-3 pl-1">
-            <li class="flex flex-col gap-0.5">
-              <a class="link-accent" href="https://github.com/marcoboone/Atombots_Simulation_ML_GA">neural network from scratch</a>
-              <p class="text-subtext0">Neural network written from scratch in C#, trained with a genetic algorithm to control swarm robots in Unity.</p>
-              <ul class="text-subtext0 list-disc pl-5">
-                <li>Custom matrix math and forward propagation, no ML libraries</li>
-                <li>Genetic algorithm mutates weights and biases each generation</li>
-              </ul>
-            </li>
             <li class="flex flex-col gap-0.5">
               <div class="flex items-center gap-2">
                 <a class="link-accent" href="https://github.com/marco-boone/minventory">minventory</a>

@@ -1,0 +1,233 @@
+---
+import ProjectPage from "../../layouts/ProjectPage.astro";
+import StatGrid from "../../components/StatGrid.astro";
+
+// Pipeline grouped into front end, middle, and back end
+// FILLER: check the structures against the final design
+const groups = [
+  {
+    name: "front end",
+    stroke: "stroke-blue",
+    fill: "fill-blue",
+    stages: [
+      { name: "Fetch", detail: "I-cache, BTB" },
+      { name: "Decode", detail: "RISC-V decoder" },
+    ],
+  },
+  {
+    name: "middle",
+    stroke: "stroke-mauve",
+    fill: "fill-mauve",
+    stages: [
+      { name: "Dispatch", detail: "rename, ROB alloc" },
+      { name: "Issue", detail: "reservation stns" },
+    ],
+  },
+  {
+    name: "back end",
+    stroke: "stroke-teal",
+    fill: "fill-teal",
+    stages: [
+      { name: "Execute", detail: "ALU x2, MULT, LSQ" },
+      { name: "Complete", detail: "CDB broadcast" },
+      { name: "Retire", detail: "commit from ROB" },
+    ],
+  },
+];
+const colX = (c: number) => c * 165;
+const rowY = (r: number) => 34 + r * 64;
+const boxW = 150;
+const boxH = 50;
+const midY = (r: number) => rowY(r) + boxH / 2;
+
+// Cycle-by-cycle timeline. Each row: label, cycles spent waiting, then running.
+type Row = { label: string; wait: [number, number] | null; run: [number, number]; miss?: boolean };
+const inOrder: Row[] = [
+  { label: "lw  x1, 0(x9)", wait: null, run: [0, 8], miss: true },
+  { label: "add x2, x1, x3", wait: [1, 8], run: [8, 9] },
+  { label: "mul x4, x5, x6", wait: [2, 9], run: [9, 10] },
+  { label: "sub x7, x8, x6", wait: [3, 10], run: [10, 11] },
+];
+const outOfOrder: Row[] = [
+  { label: "lw  x1, 0(x9)", wait: null, run: [0, 8], miss: true },
+  { label: "add x2, x1, x3", wait: [1, 8], run: [8, 9] },
+  { label: "mul x4, x5, x6", wait: null, run: [1, 2] },
+  { label: "sub x7, x8, x6", wait: null, run: [2, 3] },
+];
+const cycleX = (c: number) => 150 + c * 27;
+const panels = [
+  { title: "in-order", result: "11 cycles", rows: inOrder, top: 0 },
+  { title: "out-of-order", result: "9 cycles", rows: outOfOrder, top: 122 },
+];
+---
+
+<ProjectPage
+  slug="ooo-cpu"
+  title="OoO RISC-V CPU"
+  tagline="A 2-wide superscalar, out-of-order RISC-V core in SystemVerilog, built in the style of the MIPS R10K. EECS 472 team project with Niki Lin, Shaoqian Zhou, and Sophia Chen."
+  tags={["SystemVerilog", "RISC-V", "R10K", "EECS 472"]}
+  links={[
+    { label: "github (private)", href: "https://github.com/marco-boone/" },
+    { label: "slide deck", href: "/mde_slides" },
+  ]}
+>
+  <!-- FILLER: swap in final numbers once the CPU is done -->
+  <StatGrid
+    stats={[
+      { value: "2-wide", label: "superscalar" },
+      { value: "32", label: "ROB entries" },
+      { value: "16", label: "RS entries" },
+      { value: "~1.0", label: "target CPI" },
+    ]}
+  />
+
+  <section>
+    <h2>The problem</h2>
+    <p>
+      In a simple in-order pipeline, one slow load (like a cache miss) stalls every instruction
+      behind it, even ones that don't depend on it. An out-of-order core runs ready instructions
+      early and commits them in program order, so the program still behaves correctly.
+    </p>
+  </section>
+
+  <figure>
+    <svg viewBox="0 0 480 268" class="w-full h-auto" role="img" aria-label="Timeline comparing in-order and out-of-order execution after a cache miss">
+      {
+        panels.map((panel) => (
+          <g>
+            <text x="0" y={panel.top + 14} font-size="13" class="fill-text" font-weight="bold">{panel.title}</text>
+            <text x="474" y={panel.top + 14} font-size="13" text-anchor="end" class="fill-subtext0">{panel.result}</text>
+            {panel.rows.map((row, r) => {
+              const y = panel.top + 28 + r * 22;
+              return (
+                <g>
+                  <text x="0" y={y + 12} font-size="12" class="fill-subtext1">{row.label}</text>
+                  <rect x={cycleX(0)} y={y} width={cycleX(12) - cycleX(0)} height="16" rx="3" class="fill-surface1/60" />
+                  {row.wait && (
+                    <rect
+                      x={cycleX(row.wait[0]) + 1}
+                      y={y + 1}
+                      width={(row.wait[1] - row.wait[0]) * 27 - 2}
+                      height="14"
+                      rx="3"
+                      class="fill-yellow/15 stroke-yellow/60"
+                      stroke-dasharray="3 2"
+                    />
+                  )}
+                  <rect
+                    x={cycleX(row.run[0]) + 1}
+                    y={y}
+                    width={(row.run[1] - row.run[0]) * 27 - 2}
+                    height="16"
+                    rx="3"
+                    class={row.miss ? "fill-red/80" : "fill-blue"}
+                  />
+                </g>
+              );
+            })}
+          </g>
+        ))
+      }
+      <g font-size="12">
+        <rect x="0" y="252" width="12" height="12" rx="2" class="fill-red/80" />
+        <text x="18" y="262" class="fill-subtext0">cache miss</text>
+        <rect x="130" y="252" width="12" height="12" rx="2" class="fill-blue" />
+        <text x="148" y="262" class="fill-subtext0">executing</text>
+        <rect x="250" y="252" width="12" height="12" rx="2" class="fill-yellow/15 stroke-yellow/60" stroke-dasharray="3 2" />
+        <text x="268" y="262" class="fill-subtext0">stalled</text>
+      </g>
+    </svg>
+    <figcaption>
+      One load misses in the cache. In order, the independent <code>mul</code> and <code>sub</code> stall
+      behind it. Out of order, they run during the miss and the program finishes 2 cycles sooner.
+    </figcaption>
+  </figure>
+
+  <section>
+    <h2>Architecture</h2>
+    <p>
+      The core is split into a front end that fetches and decodes, a middle that renames registers
+      and tracks instructions, and a back end that executes them and commits results in order.
+    </p>
+  </section>
+
+  <figure>
+    <svg viewBox="0 0 480 244" class="w-full h-auto" role="img" aria-label="Block diagram of the out-of-order pipeline">
+      <defs>
+        <marker id="ooo-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" class="fill-subtext0" />
+        </marker>
+        <marker id="ooo-arrow-wake" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" class="fill-yellow" />
+        </marker>
+      </defs>
+
+      {
+        groups.map((group, c) => (
+          <g>
+            <text x={colX(c)} y="14" font-size="13" font-weight="bold" class={group.fill}>{group.name}</text>
+            <line x1={colX(c)} y1="22" x2={colX(c) + boxW} y2="22" class={group.stroke} stroke-width="2" />
+            {group.stages.map((stage, r) => (
+              <g>
+                <rect x={colX(c)} y={rowY(r)} width={boxW} height={boxH} rx="5" class={`fill-surface0 ${group.stroke}`} stroke-width="1.5" />
+                <text x={colX(c) + 12} y={rowY(r) + 21} font-size="13" font-weight="bold" class="fill-text">{stage.name}</text>
+                <text x={colX(c) + 12} y={rowY(r) + 38} font-size="11" class="fill-subtext0">{stage.detail}</text>
+                {r < group.stages.length - 1 && (
+                  <line x1={colX(c) + boxW / 2} y1={rowY(r) + boxH} x2={colX(c) + boxW / 2} y2={rowY(r + 1) - 2} class="stroke-subtext0" stroke-width="1.5" marker-end="url(#ooo-arrow)" />
+                )}
+              </g>
+            ))}
+          </g>
+        ))
+      }
+
+      <!-- Decode -> Dispatch, Issue -> Execute -->
+      <path d={`M${boxW},${midY(1)} H157 V${midY(0)} H${colX(1) - 2}`} fill="none" class="stroke-subtext0" stroke-width="1.5" marker-end="url(#ooo-arrow)" />
+      <path d={`M${colX(1) + boxW},${midY(1)} H322 V${midY(0)} H${colX(2) - 2}`} fill="none" class="stroke-subtext0" stroke-width="1.5" marker-end="url(#ooo-arrow)" />
+
+      <!-- Complete -> Issue wakeup -->
+      <path
+        d={`M${colX(2)},${midY(1) + 10} H326 V214 H${colX(1) + boxW / 2} V${rowY(1) + boxH + 2}`}
+        fill="none"
+        stroke-dasharray="5 3"
+        stroke-width="1.5"
+        class="stroke-yellow"
+        marker-end="url(#ooo-arrow-wake)"
+      />
+      <text x={colX(1) + boxW / 2} y="234" text-anchor="middle" font-size="12" class="fill-yellow">wakeup via CDB</text>
+    </svg>
+    <figcaption>
+      Instructions flow down each column, left to right. Finished results are broadcast on the common
+      data bus (CDB), which wakes up instructions waiting in the reservation stations.
+    </figcaption>
+  </figure>
+
+  <section>
+    <h2>Key features</h2>
+    <!-- FILLER: confirm against the final design -->
+    <ul class="bullets">
+      <li>Register renaming with a map table and free list, R10K-style</li>
+      <li>Reorder buffer (ROB) for in-order commit and precise exceptions</li>
+      <li>Reservation stations that issue instructions as soon as their operands are ready</li>
+      <li>Branch prediction with a BTB, and recovery on a mispredict</li>
+      <li>Load/store queue for memory ordering</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>My role</h2>
+    <!-- FILLER: describe what you personally built -->
+    <p>
+      I designed and verified the reorder buffer and the rename logic, and helped integrate the
+      middle of the core with the front and back ends.
+    </p>
+  </section>
+
+  <section>
+    <h2>Process</h2>
+    <p>
+      We agreed on interfaces first, then built each module in small, tested pieces and integrated
+      them one feature at a time. The goal was a working core by Oct 29 and the full CPU by Nov 20.
+    </p>
+  </section>
+</ProjectPage>

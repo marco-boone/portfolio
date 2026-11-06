@@ -1,0 +1,156 @@
+---
+import ProjectPage from "../../layouts/ProjectPage.astro";
+import StatGrid from "../../components/StatGrid.astro";
+
+// FILLER: swap in the real network shape and inputs
+const layers = [
+  { name: "input", x: 110, color: "blue", labels: ["sensor 1", "sensor 2", "sensor 3", "sensor 4", "heading"] },
+  { name: "hidden", x: 245, color: "mauve", labels: ["", "", "", "", "", ""] },
+  { name: "output", x: 380, color: "teal", labels: ["left motor", "right motor"] },
+];
+const nodeFill: Record<string, string> = { blue: "fill-blue/20 stroke-blue", mauve: "fill-mauve/20 stroke-mauve", teal: "fill-teal/20 stroke-teal" };
+const nodeText: Record<string, string> = { blue: "fill-blue", mauve: "fill-mauve", teal: "fill-teal" };
+const height = 220;
+const nodeY = (count: number, i: number) => 34 + ((height - 44) / count) * (i + 0.5);
+
+// FILLER: swap in the real population size
+const gaSteps = [
+  { name: "spawn", detail: "50 robots" },
+  { name: "simulate", detail: "run in Unity" },
+  { name: "score", detail: "fitness" },
+  { name: "evolve", detail: "select, mutate" },
+];
+const stepW = 105;
+const stepX = (i: number) => i * (stepW + 20);
+---
+
+<ProjectPage
+  slug="neural-network"
+  title="Neural Network from Scratch"
+  tagline="A neural network written from scratch in C#, with no ML libraries, and trained with a genetic algorithm to control swarm robots in a Unity simulation."
+  tags={["C#", "Unity", "neural networks", "genetic algorithms"]}
+  links={[{ label: "github", href: "https://github.com/marcoboone/Atombots_Simulation_ML_GA" }]}
+>
+  <!-- FILLER: swap in the real numbers -->
+  <StatGrid
+    stats={[
+      { value: "0", label: "ML libraries" },
+      { value: "5-6-2", label: "network shape" },
+      { value: "50", label: "robots / generation" },
+      { value: "200+", label: "generations" },
+    ]}
+  />
+
+  <section>
+    <h2>Overview</h2>
+    <p>
+      Each robot in the swarm is controlled by its own small neural network. The network reads the
+      robot's sensors and outputs motor speeds. Instead of backpropagation, the networks are trained
+      with a genetic algorithm: the best performers each generation are copied and mutated.
+    </p>
+  </section>
+
+  <figure>
+    <svg viewBox={`0 0 480 ${height}`} class="w-full h-auto" role="img" aria-label="Diagram of the network's input, hidden, and output layers">
+      {
+        layers.slice(0, -1).map((layer, l) => {
+          const next = layers[l + 1];
+          return layer.labels.map((_, i) =>
+            next.labels.map((_, j) => (
+              <line
+                x1={layer.x}
+                y1={nodeY(layer.labels.length, i)}
+                x2={next.x}
+                y2={nodeY(next.labels.length, j)}
+                class="stroke-overlay1"
+                stroke-opacity="0.6"
+              />
+            ))
+          );
+        })
+      }
+      {
+        layers.map((layer, l) => (
+          <g>
+            <text x={layer.x} y="14" text-anchor="middle" font-size="13" font-weight="bold" class={nodeText[layer.color]}>{layer.name}</text>
+            {layer.labels.map((label, i) => {
+              const y = nodeY(layer.labels.length, i);
+              return (
+                <g>
+                  <circle cx={layer.x} cy={y} r="10" class="fill-crust" />
+                  <circle cx={layer.x} cy={y} r="10" class={nodeFill[layer.color]} stroke-width="2" />
+                  {l === 0 && <text x={layer.x - 18} y={y + 4} text-anchor="end" font-size="12" class="fill-subtext1">{label}</text>}
+                  {l === 2 && <text x={layer.x + 18} y={y + 4} font-size="12" class="fill-subtext1">{label}</text>}
+                </g>
+              );
+            })}
+          </g>
+        ))
+      }
+    </svg>
+    <figcaption>Sensor readings go in, motor speeds come out. Every line is a weight in a hand-written matrix.</figcaption>
+  </figure>
+
+  <section>
+    <h2>Training with a genetic algorithm</h2>
+    <p>
+      Every generation, each robot is scored on how well it does its task. The top robots survive,
+      and their weights and biases are copied and randomly mutated to make the next generation.
+    </p>
+  </section>
+
+  <figure>
+    <svg viewBox="0 0 480 140" class="w-full h-auto" role="img" aria-label="Genetic algorithm training loop">
+      <defs>
+        <marker id="ga-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" class="fill-subtext0" />
+        </marker>
+        <marker id="ga-arrow-loop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" class="fill-yellow" />
+        </marker>
+      </defs>
+      {
+        gaSteps.map((step, i) => (
+          <g>
+            <rect x={stepX(i)} y="10" width={stepW} height="54" rx="5" class="fill-surface0 stroke-teal" stroke-width="1.5" />
+            <text x={stepX(i) + stepW / 2} y="33" text-anchor="middle" font-size="13" font-weight="bold" class="fill-text">{step.name}</text>
+            <text x={stepX(i) + stepW / 2} y="51" text-anchor="middle" font-size="11" class="fill-subtext0">{step.detail}</text>
+            {i < gaSteps.length - 1 && (
+              <line x1={stepX(i) + stepW} y1="37" x2={stepX(i + 1) - 2} y2="37" class="stroke-subtext0" stroke-width="1.5" marker-end="url(#ga-arrow)" />
+            )}
+          </g>
+        ))
+      }
+      <path
+        d={`M${stepX(3) + stepW / 2},64 V100 H${stepX(0) + stepW / 2} V66`}
+        fill="none"
+        stroke-dasharray="5 3"
+        stroke-width="1.5"
+        class="stroke-yellow"
+        marker-end="url(#ga-arrow-loop)"
+      />
+      <text x="240" y="124" text-anchor="middle" font-size="12" class="fill-yellow">repeat for the next generation</text>
+    </svg>
+    <figcaption>The training loop repeats until the swarm's behavior stops improving.</figcaption>
+  </figure>
+
+  <section>
+    <h2>Key features</h2>
+    <ul class="bullets">
+      <li>Custom matrix math and forward propagation, no ML libraries</li>
+      <li>Genetic algorithm mutates weights and biases each generation</li>
+      <!-- FILLER -->
+      <li>Fitness function rewards reaching the goal and penalizes collisions</li>
+      <li>Simulated in Unity so a whole generation runs in parallel</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Results</h2>
+    <!-- FILLER: add a GIF or chart of fitness over generations -->
+    <p>
+      Early generations wander randomly. After a few hundred generations, the robots learn to move
+      toward the goal and avoid each other.
+    </p>
+  </section>
+</ProjectPage>

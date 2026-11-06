@@ -1,0 +1,162 @@
+---
+import ProjectPage from "../../layouts/ProjectPage.astro";
+import StatGrid from "../../components/StatGrid.astro";
+
+// FILLER: swap in the real parts list and buses
+// Inputs on the left, outputs and storage on the right
+const peripherals = [
+  { name: "IMU", bus: "I2C", side: "left", row: 0 },
+  { name: "flex sensors", bus: "ADC", side: "left", row: 1 },
+  { name: "microphone", bus: "ADC", side: "left", row: 2 },
+  { name: "wireless", bus: "UART", side: "right", row: 0 },
+  { name: "SD card", bus: "SPI", side: "right", row: 1 },
+  { name: "speaker", bus: "DAC", side: "right", row: 2 },
+];
+const busColor: Record<string, string> = {
+  I2C: "stroke-mauve",
+  ADC: "stroke-teal",
+  UART: "stroke-yellow",
+  SPI: "stroke-blue",
+  DAC: "stroke-pink",
+};
+const busText: Record<string, string> = {
+  I2C: "fill-mauve",
+  ADC: "fill-teal",
+  UART: "fill-yellow",
+  SPI: "fill-blue",
+  DAC: "fill-pink",
+};
+const periW = 124;
+const periH = 46;
+const mcu = { x: 180, y: 92, w: 120, h: 70 };
+const periY = (r: number) => 20 + r * 84;
+
+// FILLER: swap in the real gestures
+const states = [
+  { name: "recording", x: 0 },
+  { name: "idle", x: 180 },
+  { name: "playing", x: 360 },
+];
+---
+
+<ProjectPage
+  slug="mimu-glove"
+  title="MiMU Glove"
+  tagline="A wireless glove that records and plays back audio with hand gestures. Bare-metal C on an STM32 (Cortex-M4), built for EECS 373."
+  tags={["C", "STM32", "Cortex-M4", "bare metal", "EECS 373"]}
+  links={[{ label: "github", href: "https://github.com/marco-boone/373fp" }]}
+>
+  <!-- FILLER: swap in the real numbers -->
+  <StatGrid
+    stats={[
+      { value: "0", label: "RTOS" },
+      { value: "6+", label: "peripherals" },
+      { value: "3", label: "buses" },
+      { value: "<20 ms", label: "gesture latency" },
+    ]}
+  />
+
+  <section>
+    <h2>Overview</h2>
+    <p>
+      The glove reads hand motion and finger bends, recognizes gestures, and uses them to control
+      audio: start a recording, play it back, or stop. Everything runs bare metal with no RTOS, so
+      all peripheral timing is handled with interrupts and DMA.
+    </p>
+  </section>
+
+  <!-- FILLER: add a photo of the glove here, e.g. <img src="/images/glove.jpg" alt="..." /> -->
+
+  <figure>
+    <svg viewBox="0 0 480 270" class="w-full h-auto" role="img" aria-label="System diagram of the STM32 and its peripherals">
+      <text x="0" y="10" font-size="12" class="fill-subtext0">inputs</text>
+      <text x="480" y="10" font-size="12" text-anchor="end" class="fill-subtext0">outputs</text>
+      {
+        peripherals.map((p) => {
+          const x = p.side === "left" ? 0 : 480 - periW;
+          const y = periY(p.row);
+          const edgeX = p.side === "left" ? x + periW : x;
+          const mcuX = p.side === "left" ? mcu.x : mcu.x + mcu.w;
+          const mcuY = mcu.y + 17 + p.row * 18;
+          return (
+            <g>
+              <path d={`M${edgeX},${y + periH / 2} L${mcuX},${mcuY}`} fill="none" class={busColor[p.bus]} stroke-width="1.5" />
+              <rect x={x} y={y} width={periW} height={periH} rx="5" class="fill-surface0 stroke-overlay1" stroke-width="1.5" />
+              <text x={x + periW / 2} y={y + 20} text-anchor="middle" font-size="13" class="fill-text">{p.name}</text>
+              <text x={x + periW / 2} y={y + 36} text-anchor="middle" font-size="12" font-weight="bold" class={busText[p.bus]}>{p.bus}</text>
+            </g>
+          );
+        })
+      }
+      <rect x={mcu.x} y={mcu.y} width={mcu.w} height={mcu.h} rx="6" class="fill-blue/10 stroke-blue" stroke-width="2" />
+      <text x={mcu.x + mcu.w / 2} y={mcu.y + 31} text-anchor="middle" font-size="15" font-weight="bold" class="fill-text">STM32</text>
+      <text x={mcu.x + mcu.w / 2} y={mcu.y + 50} text-anchor="middle" font-size="12" class="fill-subtext0">Cortex-M4</text>
+    </svg>
+    <figcaption>The STM32 talks to each part directly. Each wire is colored by its bus: I2C, ADC, UART, SPI, or DAC.</figcaption>
+  </figure>
+
+  <section>
+    <h2>Gesture control</h2>
+    <p>
+      Sensor reads are triggered by a timer interrupt. Each sample is checked against simple
+      thresholds, and a small state machine turns gestures into actions.
+    </p>
+  </section>
+
+  <figure>
+    <svg viewBox="0 0 480 130" class="w-full h-auto" role="img" aria-label="State machine for gesture control">
+      <defs>
+        <marker id="glove-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" class="fill-subtext0" />
+        </marker>
+      </defs>
+      {
+        states.map((s) => (
+          <g>
+            <rect
+              x={s.x}
+              y="42"
+              width="120"
+              height="46"
+              rx="23"
+              class={s.name === "idle" ? "fill-blue/10 stroke-blue" : "fill-surface0 stroke-overlay1"}
+              stroke-width="1.5"
+            />
+            <text x={s.x + 60} y="70" text-anchor="middle" font-size="13" class="fill-text">{s.name}</text>
+          </g>
+        ))
+      }
+      <g font-size="12" class="fill-yellow" text-anchor="middle">
+        <line x1="180" y1="56" x2="123" y2="56" class="stroke-subtext0" stroke-width="1.5" marker-end="url(#glove-arrow)" />
+        <text x="150" y="30">fist</text>
+        <line x1="120" y1="74" x2="177" y2="74" class="stroke-subtext0" stroke-width="1.5" marker-end="url(#glove-arrow)" />
+        <text x="150" y="110">open hand</text>
+        <line x1="300" y1="56" x2="357" y2="56" class="stroke-subtext0" stroke-width="1.5" marker-end="url(#glove-arrow)" />
+        <text x="330" y="30">swipe right</text>
+        <line x1="360" y1="74" x2="303" y2="74" class="stroke-subtext0" stroke-width="1.5" marker-end="url(#glove-arrow)" />
+        <text x="330" y="110">swipe left</text>
+      </g>
+    </svg>
+    <figcaption>How gestures move the glove between idle, recording, and playback.</figcaption>
+  </figure>
+
+  <section>
+    <h2>Key features</h2>
+    <ul class="bullets">
+      <li>No RTOS: 6+ peripherals over SPI, I2C, and UART, all in bare-metal C</li>
+      <li>Interrupt-driven gesture recognition</li>
+      <!-- FILLER -->
+      <li>DMA for audio sampling so the CPU stays free for gesture processing</li>
+      <li>Recordings saved to an SD card</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>What I learned</h2>
+    <!-- FILLER -->
+    <p>
+      Without an RTOS, every timing decision is yours. I learned to set interrupt priorities
+      carefully, keep handlers short, and read datasheets closely to get each peripheral working.
+    </p>
+  </section>
+</ProjectPage>

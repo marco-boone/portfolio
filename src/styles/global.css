@@ -12,8 +12,8 @@
   }
 
   ::selection {
-    background-color: rgb(69 129 235 / 0.35);
-    color: #eeeeee;
+    background-color: #7030af;
+    color: #ffffff;
   }
 }
 
@@ -39,4 +39,33 @@
 
 .animate-spin {
   animation: spin 3s linear infinite;
+}
+
+/* Project detail pages */
+.project-body h2 {
+  @apply section-label mb-3;
+}
+
+.project-body p {
+  @apply text-subtext0;
+}
+
+.project-body ul.bullets {
+  @apply text-subtext0 list-disc pl-5 flex flex-col gap-1;
+}
+
+.project-body figure {
+  @apply flex flex-col gap-3 rounded-md border border-overlay0 bg-surface0/60 p-3 sm:p-4;
+}
+
+.project-body figcaption {
+  @apply text-subtext0 text-xs leading-relaxed;
+}
+
+.project-body svg {
+  overflow: visible;
+}
+
+.project-body svg text {
+  font-family: inherit;
 }
