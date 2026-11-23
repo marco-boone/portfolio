@@ -1,0 +1,1016 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- CLAUDE: standalone copy of the die-portrait artifact; ?embed shows only the die (used by projects/ooo-cpu) -->
+<script>if (new URLSearchParams(location.search).has('embed')) document.documentElement.classList.add('embed');</script>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; font-size: 14px; }
+.embed body { padding: 0; background: #050409; }
+.embed .wall { gap: 0; max-width: none; }
+.embed .frame { padding: 0; border: 0; box-shadow: none; background: none; }
+.embed .hint, .embed .placard { display: none; }
+</style>
+<title>Group 5 Die Portrait</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@300;800&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500&display=swap">
+<style>
+/* Layout: a gallery wall. One framed die photograph, a museum placard beneath. Deliberately single dark theme. */
+:root {
+  --wall: #0a0910;
+  --frame: #17141f;
+  --ink: #e9e4f2;
+  --muted: #8f87a3;
+  --gold: #d9b45a;
+  --copper: #c8794a;
+  --teal: #4fc3b8;
+  --magenta: #c9569b;
+  --ice: #9fd3ff;
+  --rust: #e2574c;
+  --f-display: "Big Shoulders Display", "Arial Narrow", sans-serif;
+  --f-body: "Instrument Sans", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, monospace;
+  color-scheme: dark;
+}
+html, body { background: var(--wall); color: var(--ink); }
+body {
+  font-family: var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 64px;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 30%, #1c1830 0%, transparent 70%),
+    var(--wall);
+}
+.wall { max-width: 1500px; margin: 0 auto; display: grid; gap: 40px; }
+.frame {
+  position: relative;
+  padding: clamp(8px, 2vw, 28px);
+  background: linear-gradient(145deg, #221d2e, #0f0d16);
+  border: 1px solid #2c2639;
+  box-shadow: 0 40px 80px -30px #000, inset 0 0 0 1px #00000080;
+}
+.mat { position: relative; background: #050409; line-height: 0; }
+canvas { display: block; width: 100%; height: auto; }
+#fx { position: absolute; inset: 0; pointer-events: none; }
+#hit { position: absolute; inset: 0; cursor: crosshair; }
+.tip {
+  position: absolute; z-index: 5; pointer-events: none;
+  min-width: 220px; max-width: 300px;
+  background: #0c0a14ee; border: 1px solid var(--gold);
+  padding: 12px 14px; line-height: 1.45;
+  font-family: var(--f-mono); font-size: 12px; color: var(--ink);
+  box-shadow: 0 12px 30px #000a;
+}
+.tip b { display: block; font-family: var(--f-display); font-weight: 800; font-size: 22px; letter-spacing: .04em; text-transform: uppercase; color: var(--gold); line-height: 1.1; }
+.tip .file { color: var(--muted); font-size: 11px; }
+.tip p { margin: 8px 0 0; font-family: var(--f-body); font-size: 13px; }
+
+.placard {
+  display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 48px;
+  max-width: 1100px; margin: 0 auto; width: 100%;
+}
+@media (max-width: 760px) { .placard { grid-template-columns: minmax(0, 1fr); gap: 28px; } }
+.eyebrow { font-family: var(--f-mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+h1 {
+  font-family: var(--f-display); font-weight: 800; text-transform: uppercase;
+  font-size: clamp(44px, 7vw, 88px); line-height: .88; letter-spacing: .01em;
+  margin: 10px 0 14px; text-wrap: balance;
+  background: linear-gradient(100deg, var(--gold), #f1dfae 40%, var(--copper) 75%, var(--magenta));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.meta { font-family: var(--f-mono); font-size: 13px; color: var(--muted); line-height: 1.7; }
+.meta span { color: var(--ink); }
+.note { font-size: 15px; line-height: 1.65; max-width: 62ch; color: #cfc8dc; }
+.note p { margin: 0 0 12px; }
+.legend { display: grid; gap: 10px; margin-top: 18px; }
+.legend div { display: flex; align-items: center; gap: 12px; font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.legend i { width: 34px; height: 3px; flex: none; border-radius: 2px; }
+.specs { width: 100%; border-collapse: collapse; font-family: var(--f-mono); font-size: 12px; font-variant-numeric: tabular-nums; }
+.specs td { padding: 6px 0; border-bottom: 1px solid #241f30; color: var(--muted); }
+.specs td:last-child { text-align: right; color: var(--ink); }
+.hint { font-family: var(--f-mono); font-size: 11px; color: var(--muted); text-align: center; letter-spacing: .1em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<div class="wall">
+  <div class="frame">
+    <div class="mat" id="mat">
+      <canvas id="die" width="1800" height="1240" aria-label="An imagined die photograph of the Group 5 out-of-order RISC-V processor"></canvas>
+      <canvas id="fx" width="1800" height="1240" aria-hidden="true"></canvas>
+      <div id="hit"></div>
+      <div class="tip" id="tip" hidden></div>
+    </div>
+  </div>
+  <div class="hint">Hover or tap a block to read its plate</div>
+
+  <section class="placard">
+    <div>
+      <div class="eyebrow">EECS 472 · Fall 2026 · Group 5</div>
+      <h1>Portrait of a Two-Wide Mind</h1>
+      <div class="meta">
+        <span>R10K-style out-of-order RISC-V core</span><br>
+        4,088 lines of SystemVerilog, rendered as an imagined die<br>
+        Canvas 2D · 1800 × 1240 logical px · seeded, deterministic
+      </div>
+      <div class="note" style="margin-top:22px">
+        <p>No fab ever saw this chip. The floorplan is invented, but each block is drawn with the logic it actually contains: adders and output muxes in the ALUs, a partial-product, shift and add slice in each of the four multiplier stages, tag comparators in the caches, wakeup comparators and priority selectors in the reservation station, a PLA in each decoder, and the load unit's state machine.</p>
+        <p>The two gold rails that loop the die are the common data bus, two results wide, carrying tags back to whoever is waiting. Look for the doodle in the lower right corner. Real chip designers have hidden drawings in their metal layers for decades.</p>
+      </div>
+      <div class="legend">
+        <div><i style="background:var(--ice)"></i>dispatch_packet, decode to rename</div>
+        <div><i style="background:var(--magenta)"></i>issue_packet, RS to issue_reg to EX</div>
+        <div><i style="background:var(--gold)"></i>CDB ×2, writeback and wakeup</div>
+        <div><i style="background:var(--rust)"></i>mispredict, redirect and checkpoint restore</div>
+        <div><i style="background:var(--teal)"></i>memory, icache · loads · retired stores</div>
+      </div>
+    </div>
+    <div>
+      <div class="eyebrow" style="margin-bottom:10px">Specifications, from sys_defs.svh</div>
+      <table class="specs">
+        <tr><td>Superscalar width · N</td><td>2</td></tr>
+        <tr><td>CDB width · CDB_SZ</td><td>2</td></tr>
+        <tr><td>Reorder buffer · ROB_SZ</td><td>32</td></tr>
+        <tr><td>Reservation station · RS_SZ</td><td>8</td></tr>
+        <tr><td>Physical registers · 32 + ROB_SZ</td><td>64</td></tr>
+        <tr><td>Branch stack · BSTACK_SZ</td><td>4</td></tr>
+        <tr><td>Store queue · LSQ_SZ</td><td>8</td></tr>
+        <tr><td>Fetch buffer · FB_SZ</td><td>8</td></tr>
+        <tr><td>BTB · BTB_SZ</td><td>16</td></tr>
+        <tr><td>I-cache lines · ICACHE_LINES</td><td>64 × 64 b</td></tr>
+        <tr><td>I-MSHRs · IMSHR_SZ</td><td>8</td></tr>
+        <tr><td>Multiplier · MULT_STAGES</td><td>4</td></tr>
+        <tr><td>Memory tags · NUM_MEM_TAGS</td><td>15</td></tr>
+        <tr><td>Main memory</td><td>64 KiB · 100 ns</td></tr>
+      </table>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+const W = 1800, H = 1240;
+const die = document.getElementById('die'), fx = document.getElementById('fx');
+const ctx = die.getContext('2d'), fctx = fx.getContext('2d');
+const DPR = Math.min(2, window.devicePixelRatio || 1);
+for (const c of [die, fx]) { c.width = W * DPR; c.height = H * DPR; }
+ctx.scale(DPR, DPR); fctx.scale(DPR, DPR);
+
+// seeded rng
+let seed = 0x472f26;
+const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const pick = a => a[Math.floor(rnd() * a.length)];
+const hsl = (h, s, l, a = 1) => `hsla(${h},${s}%,${l}%,${a})`;
+const MONO = '"IBM Plex Mono", ui-monospace, monospace';
+const DISP = '"Big Shoulders Display", "Arial Narrow", sans-serif';
+
+const C = { gold: '#d9b45a', copper: '#c8794a', teal: '#4fc3b8', magenta: '#c9569b', ice: '#9fd3ff', rust: '#e2574c' };
+
+// ---------- blocks ----------
+// hue = the block's oxide tint
+const B = {
+  icache:  { x:110, y:110, w:290, h:300, hue:200, kind:'sram', rows:64, cols:64, label:'ICACHE', sub:'64 lines × 64b · direct mapped', file:'frontend/icache.sv', loc:181, desc:'Instruction cache. One 8-byte block per cycle, two instructions wide. Misses go to memory through mem_arb and come back by memory tag.' },
+  itags:   { x:408, y:110, w:36, h:300, hue:210, kind:'sram', rows:64, cols:6, label:'TAG', sub:'', file:'frontend/icache.sv', loc:181, desc:'Tag array for the icache. Valid bit plus the upper address bits for each of the 64 lines.' },
+  imshr:   { x:460, y:110, w:100, h:120, hue:180, kind:'table', rows:8, label:'IMSHR', sub:'8', file:'frontend/icache.sv', loc:181, desc:'Eight miss-status holding registers. Each tracks an outstanding icache miss by memory tag so fetch can keep several requests in flight.' },
+  btb:     { x:460, y:250, w:100, h:160, hue:280, kind:'table', rows:16, label:'BTB', sub:'16 · +2b ctr', file:'frontend/branch_predictor.sv', loc:124, desc:'Direct-mapped branch target buffer plus one global 2-bit counter. A lane predicts taken only when its PC hits in the BTB and the counter says taken.' },
+  fetch:   { x:110, y:440, w:200, h:110, hue:40, kind:'logic', label:'FETCH', sub:'PC · NPC mux', file:'frontend/fetch.sv', loc:113, desc:'Holds the PC, picks the next PC from the predictor or a mispredict redirect, and requests a fetch group of two instructions.' },
+  fbuf:    { x:330, y:440, w:230, h:110, hue:20, kind:'queue', n:8, label:'FETCH BUFFER', sub:'FB_SZ 8', file:'frontend/fetch_buffer.sv', loc:110, desc:'Eight-entry circular queue between fetch and decode. It absorbs icache bubbles and dispatch stalls.' },
+  dec0:    { x:110, y:580, w:215, h:150, hue:330, kind:'logic', label:'DECODE 0', sub:'RV32IM', file:'combinational/decoder.sv', loc:229, desc:'Combinational RV32IM decoder for lane 0. Produces the opa/opb selects, ALU function, and the cond_branch, mult, rd_mem and wr_mem flags.' },
+  dec1:    { x:345, y:580, w:215, h:150, hue:330, kind:'logic', label:'DECODE 1', sub:'RV32IM', file:'combinational/decoder.sv', loc:229, desc:'The decoder for lane 1. Same logic as lane 0, side by side.' },
+  memarb:  { x:110, y:960, w:450, h:110, hue:150, kind:'logic', label:'MEM ARB', sub:'store > load > icache', file:'mem_arb.sv', loc:68, desc:'Memory arbiter. One request per cycle reaches memory. Retired stores, loads and icache misses share the bus and get memory tags back.' },
+
+  mt:      { x:620, y:110, w:250, h:170, hue:260, kind:'grid', gx:8, gy:4, label:'MAP TABLE', sub:'32 arch → preg · ready+', file:'r10k/maptable.sv', loc:161, desc:'Rename table. Maps each of the 32 architectural registers to a physical register and keeps the ready (plus) bit. Snapshotted into the branch stack.' },
+  fl:      { x:890, y:110, w:290, h:52, hue:170, kind:'bits', n:64, label:'FREE LIST', sub:'64-bit vector', file:'r10k/freelist.sv', loc:136, desc:'Bit vector of free physical registers. Two are handed out per cycle at dispatch. Retired T_old registers come back here.' },
+  bs:      { x:890, y:178, w:290, h:102, hue:0, kind:'stack', n:4, label:'BRANCH STACK', sub:'4 checkpoints', file:'r10k/bstack.sv', loc:191, desc:'Four checkpoints. Each saves the map table, free list, ROB tail and SQ tail when a branch dispatches, so a mispredict restores in one cycle. Branches carry a one-hot bmask.' },
+  rob:     { x:620, y:300, w:560, h:440, hue:45, kind:'ring', n:32, label:'REORDER BUFFER', sub:'ROB_SZ 32 · retire 2/cycle', file:'r10k/rob.sv', loc:206, desc:'Thirty-two entries in a circle. Instructions enter at the tail in program order and retire from the head two at a time, freeing T_old and releasing stores to memory.' },
+  rs:      { x:620, y:760, w:270, h:180, hue:300, kind:'table', rows:8, fields:true, label:'RES STATION', sub:'RS_SZ 8 · psel ×2', file:'r10k/rs.sv', loc:261, desc:'Eight entries waiting on operand tags. CDB broadcasts wake them up, and two priority selectors pick up to two ready instructions per cycle.' },
+  sq:      { x:910, y:760, w:270, h:180, hue:140, kind:'ring', n:8, small:true, label:'STORE QUEUE', sub:'8 · forwarding', file:'r10k/sq.sv', loc:313, desc:'Eight-entry circular store queue. Stores sit here until they retire, then drain to memory. Loads search it for an older store to forward from or wait on.' },
+  ireg:    { x:620, y:1100, w:270, h:30, hue:300, kind:'flops', n:2, label:'ISSUE_REG', sub:'', file:'cpu.sv', loc:301, desc:'The pipeline register between issue and execute. Two lanes of ISSUE_PACKET.' },
+  creg:    { x:910, y:1100, w:270, h:30, hue:45, kind:'flops', n:2, label:'CDB_REG', sub:'', file:'cpu.sv', loc:301, desc:'Registered CDB packets that drive the register file write ports one cycle after broadcast.' },
+
+  prf:     { x:1240, y:110, w:450, h:250, hue:190, kind:'sram', rows:64, cols:32, label:'PHYS REGFILE', sub:'64 × 32b · 5R 2W', file:'regfile.sv', loc:86, desc:'Sixty-four physical registers. Four read ports for the two issue lanes, one for the commit path, and two write ports fed by cdb_reg.' },
+  alu0:    { x:1240, y:390, w:215, h:130, hue:50, kind:'alu', label:'ALU 0', sub:'add sub sll slt xor srl sra or and', file:'backend/ex.sv', loc:314, desc:'Single-cycle integer ALU for lane 0.' },
+  alu1:    { x:1475, y:390, w:215, h:130, hue:50, kind:'alu', label:'ALU 1', sub:'add sub sll slt xor srl sra or and', file:'backend/ex.sv', loc:314, desc:'Single-cycle integer ALU for lane 1.' },
+  bru:     { x:1240, y:540, w:215, h:90, hue:0, kind:'logic', label:'BRANCH', sub:'beq bne blt bge bltu bgeu', file:'backend/ex.sv', loc:314, desc:'Resolves one branch per cycle. On a mispredict it broadcasts the bmask to squash younger work and sends the real target back to fetch.' },
+  cdbarb:  { x:1475, y:540, w:215, h:90, hue:45, kind:'logic', label:'CDB ARBITER', sub:'3 + load → 2', file:'backend/cdb_arbiter.sv', loc:162, desc:'Up to three results from EX plus a finished load compete for two CDB slots. It also tells issue which lanes may enter EX this cycle.' },
+  mult:    { x:1240, y:650, w:450, h:110, hue:20, kind:'pipe', n:4, label:'MULTIPLIER', sub:'MULT_STAGES 4', file:'backend/mult.sv', loc:119, desc:'One pipelined multiplier split into four stages. Lane 0 gets priority when both lanes issue a multiply.' },
+  ldu:     { x:1240, y:790, w:450, h:150, hue:150, kind:'logic', label:'LOAD UNIT', sub:'SQ forward · mem request', file:'backend/load_unit.sv', loc:183, desc:'Takes a computed address, asks the store queue for a forward, waits when an older store address is unknown, otherwise requests memory and returns the value onto the CDB.' },
+};
+
+// ---------- texture painters ----------
+function base(b) {
+  const g = ctx.createLinearGradient(b.x, b.y, b.x + b.w, b.y + b.h);
+  g.addColorStop(0, hsl(b.hue, 35, 13));
+  g.addColorStop(1, hsl(b.hue + 30, 30, 8));
+  ctx.fillStyle = g; ctx.fillRect(b.x, b.y, b.w, b.h);
+}
+function stdcells(x, y, w, h, hue, density = 1, rowH = 6) {
+  ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+  for (let ry = y + 1; ry < y + h; ry += rowH) {
+    // power rails
+    ctx.fillStyle = hsl(hue + 20, 30, 30, .35); ctx.fillRect(x, ry, w, .6);
+    let cx = x + rnd() * 3;
+    while (cx < x + w) {
+      const cw = 1.5 + rnd() * 9;
+      if (rnd() < .86 * density) {
+        const l = 18 + rnd() * 34;
+        ctx.fillStyle = hsl(hue + (rnd() - .5) * 40, 30 + rnd() * 35, l, .55 + rnd() * .4);
+        ctx.fillRect(cx, ry + 1, cw, rowH - 1.8);
+        if (rnd() < .35) { ctx.fillStyle = hsl(hue, 20, 75, .5); ctx.fillRect(cx + cw * .4, ry + 2, .8, rowH - 3.5); }
+      }
+      cx += cw + .7;
+    }
+  }
+  // local routing on metal 2
+  ctx.globalAlpha = .28;
+  for (let i = 0; i < w * h / 900; i++) {
+    ctx.strokeStyle = rnd() < .5 ? C.copper : hsl(hue, 40, 70);
+    ctx.lineWidth = .6;
+    const sx = x + rnd() * w, sy = y + rnd() * h;
+    ctx.beginPath(); ctx.moveTo(sx, sy);
+    if (rnd() < .5) ctx.lineTo(sx + (rnd() - .5) * 60, sy); else ctx.lineTo(sx, sy + (rnd() - .5) * 40);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+function bitcells(x, y, w, h, rows, cols, hue) {
+  const cw = w / cols, ch = h / rows;
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+    const on = rnd() < .5;
+    ctx.fillStyle = on ? hsl(hue + (c % 8 === 0 ? 30 : 0), 55, 48 + rnd() * 12, .85) : hsl(hue, 30, 18, .9);
+    ctx.fillRect(x + c * cw + .25, y + r * ch + .25, Math.max(.4, cw - .5), Math.max(.4, ch - .5));
+  }
+  // word lines and bit lines
+  ctx.globalAlpha = .25; ctx.strokeStyle = hsl(hue, 30, 80); ctx.lineWidth = .3;
+  for (let c = 0; c <= cols; c += 8) { ctx.beginPath(); ctx.moveTo(x + c * cw, y); ctx.lineTo(x + c * cw, y + h); ctx.stroke(); }
+  for (let r = 0; r <= rows; r += 8) { ctx.beginPath(); ctx.moveTo(x, y + r * ch); ctx.lineTo(x + w, y + r * ch); ctx.stroke(); }
+  ctx.globalAlpha = 1;
+}
+
+const painters = {
+  sram(b) {
+    const pad = b.w > 60 ? 18 : 4;
+    stdcells(b.x + 2, b.y + 22, pad - 3, b.h - 26, b.hue, 1, 4);   // row decoder
+    stdcells(b.x + pad, b.y + b.h - (b.w > 60 ? 16 : 6), b.w - pad - 3, b.w > 60 ? 13 : 4, b.hue, 1, 4); // sense amps
+    bitcells(b.x + pad, b.y + 22, b.w - pad - 4, b.h - 22 - (b.w > 60 ? 18 : 8), b.rows, b.cols, b.hue);
+  },
+  table(b) {
+    const top = b.y + 24, rh = (b.h - 30) / b.rows;
+    for (let r = 0; r < b.rows; r++) {
+      const yy = top + r * rh;
+      stdcells(b.x + 4, yy + .5, 14, rh - 1, b.hue + 40, 1, Math.max(3, rh / 2));
+      if (b.fields) {
+        const f = [.12, .18, .18, .2, .14, .18]; let fx0 = b.x + 22;
+        f.forEach((p, i) => { const fw = (b.w - 28) * p; bitcells(fx0, yy + 1, fw - 3, rh - 2, 2, Math.max(2, Math.round(fw / 5)), b.hue + i * 18); fx0 += fw; });
+        // ready lights
+        ctx.fillStyle = rnd() < .5 ? C.gold : hsl(b.hue, 20, 25); ctx.beginPath(); ctx.arc(b.x + b.w - 8, yy + rh / 2, 2.2, 0, 7); ctx.fill();
+      } else {
+        bitcells(b.x + 22, yy + 1, b.w - 28, rh - 2, Math.max(1, Math.round(rh / 4)), 24, b.hue);
+      }
+    }
+  },
+  logic(b) { stdcells(b.x + 3, b.y + 24, b.w - 6, b.h - 27, b.hue, 1); },
+  alu(b) {
+    stdcells(b.x + 3, b.y + 24, b.w - 6, b.h - 27, b.hue, .9);
+    // datapath slices: 32 bit columns
+    const dx = b.x + 14, dw = b.w - 28;
+    ctx.globalAlpha = .55;
+    for (let i = 0; i < 32; i++) { ctx.fillStyle = hsl(b.hue + (i % 4) * 6, 50, 40 + (i % 8 === 0) * 20); ctx.fillRect(dx + i * dw / 32, b.y + 46, dw / 32 - .8, 50); }
+    ctx.globalAlpha = 1;
+    // the ALU trapezoid glyph
+    ctx.strokeStyle = hsl(b.hue, 70, 75, .8); ctx.lineWidth = 1.2;
+    const cx = b.x + b.w - 34, cy = b.y + 12;
+    ctx.beginPath(); ctx.moveTo(cx - 12, cy - 6); ctx.lineTo(cx + 12, cy - 6); ctx.lineTo(cx + 6, cy + 6); ctx.lineTo(cx - 6, cy + 6); ctx.closePath(); ctx.stroke();
+  },
+  grid(b) {
+    const top = b.y + 24, gw = (b.w - 8) / b.gx, gh = (b.h - 28) / b.gy;
+    for (let j = 0; j < b.gy; j++) for (let i = 0; i < b.gx; i++) {
+      const x = b.x + 4 + i * gw, y = top + j * gh;
+      bitcells(x + 2, y + 2, gw - 4, gh - 12, 3, 7, b.hue + (i + j) % 3 * 10);
+      ctx.fillStyle = hsl(b.hue, 30, 60, .6); ctx.font = `7px ${MONO}`;
+      ctx.fillText('x' + (j * b.gx + i), x + 3, y + gh - 3);
+      ctx.fillStyle = rnd() < .7 ? C.gold : '#3a3448'; ctx.fillRect(x + gw - 7, y + gh - 7, 3, 3);
+    }
+  },
+  bits(b) {
+    const cw = (b.w - 8) / b.n;
+    for (let i = 0; i < b.n; i++) {
+      const free = i >= 32 ? rnd() < .55 : false;
+      ctx.fillStyle = free ? hsl(b.hue, 70, 58) : hsl(b.hue, 25, 20);
+      ctx.fillRect(b.x + 4 + i * cw + .4, b.y + 24, cw - .8, 18);
+      if (i % 8 === 0) { ctx.fillStyle = hsl(b.hue, 30, 70, .7); ctx.font = `6px ${MONO}`; ctx.fillText('p' + i, b.x + 4 + i * cw + .5, b.y + 49); }
+    }
+  },
+  stack(b) {
+    const sw = (b.w - 8 - 9) / b.n;
+    for (let i = 0; i < b.n; i++) {
+      const x = b.x + 4 + i * (sw + 3), y = b.y + 22, h = b.h - 26;
+      ctx.fillStyle = hsl(b.hue + i * 8, 40, 14); ctx.fillRect(x, y, sw, h);
+      // miniature map table + free list + tails
+      bitcells(x + 3, y + 3, sw - 6, h * .5, 4, 8, 260);
+      bitcells(x + 3, y + 6 + h * .5, sw - 6, 8, 1, 32, 170);
+      stdcells(x + 3, y + 18 + h * .5, sw - 6, h * .5 - 21, b.hue + 20, 1, 4);
+      ctx.fillStyle = hsl(b.hue, 60, 70); ctx.font = `600 7px ${MONO}`; ctx.fillText('b' + i, x + sw - 13, y + h - 3);
+    }
+  },
+  queue(b) {
+    const qw = (b.w - 12) / b.n;
+    for (let i = 0; i < b.n; i++) {
+      const x = b.x + 6 + i * qw, y = b.y + 26;
+      bitcells(x + 1, y, qw - 3, b.h - 48, 10, 4, b.hue + (i % 2) * 15);
+      ctx.fillStyle = hsl(b.hue, 30, 70, .6); ctx.font = `7px ${MONO}`; ctx.fillText(i, x + qw / 2 - 2, b.y + b.h - 10);
+    }
+    // head and tail markers
+    tri(b.x + 6 + 2.5 * qw, b.y + b.h - 4, C.ice, -1); tri(b.x + 6 + 6.5 * qw, b.y + b.h - 4, C.copper, -1);
+  },
+  pipe(b) {
+    const sw = (b.w - 8) / b.n;
+    for (let i = 0; i < b.n; i++) {
+      const x = b.x + 4 + i * sw;
+      stdcells(x + 2, b.y + 24, sw - 18, b.h - 28, b.hue + i * 6, 1);
+      // pipeline register: a column of flops
+      for (let k = 0; k < 14; k++) { ctx.fillStyle = hsl(45, 60, 35 + rnd() * 25); ctx.fillRect(x + sw - 13, b.y + 26 + k * 5.8, 8, 4.2); }
+      ctx.fillStyle = hsl(b.hue, 50, 75); ctx.font = `600 8px ${MONO}`; ctx.fillText('S' + (i + 1), x + 6, b.y + b.h - 6);
+    }
+  },
+  flops(b) {
+    const n = 96, fw = (b.w - 70) / n;
+    for (let i = 0; i < n; i++) { ctx.fillStyle = hsl(b.hue + (i >= n / 2) * 30, 55, 30 + rnd() * 30); ctx.fillRect(b.x + 66 + i * fw, b.y + 6, fw - .6, b.h - 12); }
+  },
+  ring(b) { ring(b); },
+};
+
+function tri(x, y, col, dir) { ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 4, y + 6 * dir); ctx.lineTo(x + 4, y + 6 * dir); ctx.fill(); }
+
+function ring(b) {
+  const cx = b.x + b.w / 2 + (b.small ? 0 : 0), cy = b.y + b.h / 2 + (b.small ? 8 : 8);
+  const R = b.small ? 58 : 185, r = b.small ? 34 : 118;
+  const head = b.small ? 2 : 5, tail = b.small ? 6 : 23;
+  // faint concentric etch rings
+  ctx.save();
+  for (let k = 0; k < (b.small ? 6 : 26); k++) {
+    ctx.strokeStyle = hsl(b.hue, 40, 50, .06 + (k % 5 === 0) * .08); ctx.lineWidth = .6;
+    ctx.beginPath(); ctx.arc(cx, cy, R + 6 + k * 5, 0, 7); ctx.stroke();
+  }
+  ctx.restore();
+  for (let i = 0; i < b.n; i++) {
+    const a0 = -Math.PI / 2 + i * 2 * Math.PI / b.n + .012, a1 = a0 + 2 * Math.PI / b.n - .024;
+    const live = (i - head + b.n) % b.n < (tail - head + b.n) % b.n;
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx, cy, R, a0, a1); ctx.arc(cx, cy, r, a1, a0, true); ctx.closePath();
+    ctx.fillStyle = live ? hsl(b.hue + i * (b.small ? 6 : 2), 45, 24) : hsl(b.hue, 18, 10);
+    ctx.fill(); ctx.clip();
+    // radial bit lines inside the wedge
+    const steps = b.small ? 22 : 30;
+    for (let k = 0; k < steps; k++) {
+      const a = a0 + (a1 - a0) * (k + .5) / steps;
+      for (let q = 0; q < (b.small ? 6 : 14); q++) {
+        const rr = r + 3 + q * (R - r - 6) / (b.small ? 6 : 14);
+        const on = rnd() < (live ? .55 : .15);
+        ctx.fillStyle = on ? hsl(b.hue + q * 4, 60, 58, .9) : hsl(b.hue, 20, 25, .5);
+        ctx.fillRect(cx + Math.cos(a) * rr - .7, cy + Math.sin(a) * rr - .7, 1.5, 1.5);
+      }
+    }
+    ctx.restore();
+    // index numerals
+    const am = (a0 + a1) / 2;
+    ctx.fillStyle = hsl(b.hue, 35, live ? 75 : 45, .85); ctx.font = `${b.small ? 7 : 8}px ${MONO}`; ctx.textAlign = 'center';
+    ctx.fillText(i, cx + Math.cos(am) * (R + 9), cy + Math.sin(am) * (R + 9) + 3);
+    ctx.textAlign = 'left';
+  }
+  // head / tail pointers
+  const ptr = (idx, col, txt) => {
+    const a = -Math.PI / 2 + (idx + .5) * 2 * Math.PI / b.n;
+    ctx.strokeStyle = col; ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * (r - 22), cy + Math.sin(a) * (r - 22)); ctx.lineTo(cx + Math.cos(a) * (r - 4), cy + Math.sin(a) * (r - 4)); ctx.stroke();
+    ctx.fillStyle = col; ctx.beginPath(); ctx.arc(cx + Math.cos(a) * (r - 4), cy + Math.sin(a) * (r - 4), 2.4, 0, 7); ctx.fill();
+    ctx.font = `600 ${b.small ? 7 : 9}px ${MONO}`; ctx.textAlign = 'center';
+    ctx.fillText(txt, cx + Math.cos(a) * (r - 30), cy + Math.sin(a) * (r - 30) + 3); ctx.textAlign = 'left';
+  };
+  ptr(head, C.ice, 'HEAD'); ptr((tail - 1 + b.n) % b.n, C.copper, 'TAIL');
+  // core
+  if (!b.small) {
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r - 30);
+    g.addColorStop(0, hsl(45, 50, 22, .9)); g.addColorStop(1, hsl(45, 30, 8, 0));
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, r - 30, 0, 7); ctx.fill();
+    for (let k = 0; k < 9; k++) { ctx.strokeStyle = hsl(45, 60, 60, .07 + k * .01); ctx.beginPath(); ctx.arc(cx, cy, 14 + k * 8, k, k + 4.5); ctx.stroke(); }
+    // pointer logic in the core: head/tail registers, +2 incrementers, full/empty compare
+    INK = hsl(45, 55, 84); WIRE = hsl(45, 35, 64);
+    reg(cx - 66, cy - 44, 44, 20, 'HEAD', 7); reg(cx + 22, cy - 44, 44, 20, 'TAIL', 7);
+    wire([[cx - 44, cy - 24], [cx - 44, cy - 12]]); circ(cx - 44, cy - 4, 8, '+'); tx('2', cx - 58, cy - 2, 6);
+    wire([[cx + 44, cy - 24], [cx + 44, cy - 12]]); circ(cx + 44, cy - 4, 8, '+'); tx('2', cx + 58, cy - 2, 6);
+    wire([[cx - 44, cy + 4], [cx - 44, cy + 12], [cx - 66, cy + 12], [cx - 66, cy - 52], [cx - 44, cy - 52], [cx - 44, cy - 44]]);
+    wire([[cx + 44, cy + 4], [cx + 44, cy + 12], [cx + 66, cy + 12], [cx + 66, cy - 52], [cx + 44, cy - 52], [cx + 44, cy - 44]]);
+    wire([[cx - 22, cy - 34], [cx - 8, cy - 34], [cx - 8, cy + 22]]); wire([[cx + 22, cy - 34], [cx + 8, cy - 34], [cx + 8, cy + 22]]);
+    box(cx - 16, cy + 22, 32, 18, '=', 10); tx('full · empty', cx, cy + 50, 6);
+    andG(cx - 40, cy + 56, 16, 11); andG(cx + 24, cy + 56, 16, 11);
+    tx('retire0', cx - 32, cy + 76, 5.5); tx('retire1', cx + 32, cy + 76, 5.5);
+    ctx.textAlign = 'center'; ctx.font = `800 13px ${DISP}`; ctx.fillStyle = hsl(45, 70, 65, .9); ctx.fillText('ROB', cx, cy - 58); ctx.textAlign = 'left';
+  } else {
+    ctx.textAlign = 'center'; ctx.font = `800 20px ${DISP}`; ctx.strokeStyle = hsl(b.hue, 60, 65); ctx.lineWidth = .8; ctx.strokeText('SQ', cx, cy + 7); ctx.textAlign = 'left';
+  }
+}
+
+// ---------- schematic layer: recognizable logic symbols ----------
+let INK = '#e9e4f2', WIRE = '#bdb5cc';
+function pl(pts) { ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.stroke(); }
+function wire(pts, col, a = .8) { ctx.save(); ctx.strokeStyle = col || WIRE; ctx.globalAlpha = a; ctx.lineWidth = .7; pl(pts); ctx.restore(); }
+function dot(x, y, col) { ctx.fillStyle = col || INK; ctx.beginPath(); ctx.arc(x, y, 1.5, 0, 7); ctx.fill(); }
+function tx(s, x, y, size = 6.5, align = 'center', col) { ctx.fillStyle = col || INK; ctx.font = `${size}px ${MONO}`; ctx.textAlign = align; ctx.fillText(s, x, y); ctx.textAlign = 'left'; }
+function vtx(s, x, y, size = 6) { ctx.save(); ctx.translate(x, y); ctx.rotate(-Math.PI / 2); tx(s, 0, size / 3, size); ctx.restore(); }
+function shape(draw, fillCol) { ctx.beginPath(); draw(); ctx.closePath(); ctx.fillStyle = fillCol || '#0b0912e8'; ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = .9; ctx.stroke(); }
+function box(x, y, w, h, label, size) { shape(() => ctx.rect(x, y, w, h)); if (label) tx(label, x + w / 2, y + h / 2 + (size || 6.5) * .35, size || 6.5); }
+function reg(x, y, w, h, label, size) { box(x, y, w, h, label, size); ctx.strokeStyle = INK; ctx.lineWidth = .8; const c = Math.min(3, w / 4); pl([[x + w / 2 - c, y + h], [x + w / 2, y + h - c * 1.3], [x + w / 2 + c, y + h]]); }
+function mux(x, y, w, h, n, label) {
+  const k = Math.min(h * .22, w * 1.1);
+  ctx.strokeStyle = WIRE; ctx.lineWidth = .7;
+  for (let i = 0; i < n; i++) { const yy = y + h * (i + 1) / (n + 1); pl([[x - 5, yy], [x, yy]]); }
+  pl([[x + w, y + h / 2], [x + w + 5, y + h / 2]]); pl([[x + w / 2, y + h - k / 2], [x + w / 2, y + h - k / 2 + 6]]);
+  shape(() => { ctx.moveTo(x, y); ctx.lineTo(x + w, y + k); ctx.lineTo(x + w, y + h - k); ctx.lineTo(x, y + h); });
+  if (label) vtx(label, x + w / 2, y + h / 2, 5.5);
+}
+function circ(x, y, r, sym) { shape(() => ctx.arc(x, y, r, 0, Math.PI * 2)); tx(sym, x, y + r * .42, r * 1.25); }
+function aluShape(x, y, w, h, sym) {
+  shape(() => { ctx.moveTo(x, y); ctx.lineTo(x + w, y + h * .3); ctx.lineTo(x + w, y + h * .7); ctx.lineTo(x, y + h); ctx.lineTo(x, y + h * .6); ctx.lineTo(x + w * .3, y + h * .5); ctx.lineTo(x, y + h * .4); });
+  tx(sym, x + w * .64, y + h / 2 + 2.5, 7);
+}
+function andG(x, y, w, h) { shape(() => { ctx.moveTo(x, y); ctx.lineTo(x + w - h / 2, y); ctx.arc(x + w - h / 2, y + h / 2, h / 2, -Math.PI / 2, Math.PI / 2); ctx.lineTo(x, y + h); }); }
+function orG(x, y, w, h, xor) {
+  shape(() => { ctx.moveTo(x, y); ctx.quadraticCurveTo(x + w * .6, y, x + w, y + h / 2); ctx.quadraticCurveTo(x + w * .6, y + h, x, y + h); ctx.quadraticCurveTo(x + w * .3, y + h / 2, x, y); });
+  if (xor) { ctx.beginPath(); ctx.moveTo(x - 3, y); ctx.quadraticCurveTo(x - 3 + w * .3, y + h / 2, x - 3, y + h); ctx.stroke(); }
+}
+function notG(x, y, w, h) { shape(() => { ctx.moveTo(x, y); ctx.lineTo(x + w, y + h / 2); ctx.lineTo(x, y + h); }); ctx.beginPath(); ctx.arc(x + w + 2, y + h / 2, 2, 0, 7); ctx.stroke(); }
+function arrow(x1, y1, x2, y2, r1 = 0, r2 = 0) {
+  const a = Math.atan2(y2 - y1, x2 - x1);
+  const sx = x1 + Math.cos(a) * r1, sy = y1 + Math.sin(a) * r1, ex = x2 - Math.cos(a) * r2, ey = y2 - Math.sin(a) * r2;
+  ctx.strokeStyle = WIRE; ctx.lineWidth = .8; pl([[sx, sy], [ex, ey]]);
+  ctx.fillStyle = WIRE; ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(ex - Math.cos(a - .4) * 5, ey - Math.sin(a - .4) * 5); ctx.lineTo(ex - Math.cos(a + .4) * 5, ey - Math.sin(a + .4) * 5); ctx.fill();
+}
+function dim(b, a = .22) { ctx.save(); ctx.globalAlpha = a; stdcells(b.x + 3, b.y + 20, b.w - 6, b.h - 23, b.hue, 1); ctx.restore(); }
+
+const SCH = {
+  icache(b) {
+    const { x, y, w } = b;
+    box(x + 4, y + 22, 16, 196); vtx('ROW DEC 6→64', x + 12, y + 120);
+    bitcells(x + 24, y + 22, w - 28, 196, 64, 64, b.hue);
+    box(x + 24, y + 220, w - 28, 10, 'SENSE AMPS · 64b', 5.5);
+    wire([[x + 8, y + 252], [x + 30, y + 252]]); tx('tag', x + 8, y + 249, 5.5, 'left');
+    wire([[x + 8, y + 264], [x + 30, y + 264]]); tx('PC[31:9]', x + 8, y + 276, 5.5, 'left');
+    box(x + 30, y + 246, 22, 24, '=', 11);
+    wire([[x + 52, y + 258], [x + 72, y + 258]]); wire([[x + 62, y + 244], [x + 62, y + 250], [x + 72, y + 250]]); tx('valid', x + 62, y + 241, 5.5);
+    andG(x + 72, y + 246, 20, 16); wire([[x + 92, y + 254], [x + 112, y + 254]]); tx('hit', x + 104, y + 251, 5.5);
+    wire([[x + 120, y + 230], [x + 120, y + 254], [x + 150, y + 254]]); wire([[x + 128, y + 288], [x + 150, y + 288], [x + 150, y + 266]]);
+    tx('mem2proc_data', x + 124, y + 296, 5.5, 'left');
+    mux(x + 150, y + 244, 14, 34, 2, 'FILL');
+    wire([[x + 169, y + 261], [x + 200, y + 261]]); notG(x + 200, y + 255, 12, 12); wire([[x + 214, y + 261], [x + 240, y + 261]]);
+    reg(x + 240, y + 248, 40, 26, 'INST×2', 6);
+  },
+  imshr(b) {
+    const { x, y } = b, rh = (b.h - 30) / 8;
+    wire([[x + 92, y + 20], [x + 92, y + b.h - 4]]); vtx('mem_tag', x + 96, y + 60, 5);
+    for (let r = 0; r < 8; r++) {
+      const yy = y + 24 + r * rh;
+      reg(x + 6, yy + 1, 58, rh - 2.5, 'tag·addr', 5);
+      wire([[x + 64, yy + rh / 2], [x + 76, yy + rh / 2]]); circ(x + 80, yy + rh / 2, 4.2, '=');
+      wire([[x + 84.2, yy + rh / 2], [x + 92, yy + rh / 2]]); dot(x + 92, yy + rh / 2);
+    }
+  },
+  btb(b) {
+    const { x, y } = b;
+    box(x + 4, y + 24, 8, 70); bitcells(x + 14, y + 24, 52, 70, 16, 16, b.hue);
+    wire([[x + 66, y + 40], [x + 74, y + 40]]); circ(x + 80, y + 40, 6, '=');
+    wire([[x + 86, y + 40], [x + 92, y + 40], [x + 92, y + 56], [x + 70, y + 56], [x + 70, y + 62], [x + 74, y + 62]]);
+    andG(x + 74, y + 58, 16, 12); tx('hit', x + 82, y + 80, 5.5);
+    tx('PC → idx', x + 38, y + 104, 5.5);
+    reg(x + 8, y + 112, 40, 20, 'CTR 2b', 6);
+    wire([[x + 48, y + 122], [x + 62, y + 122]]); circ(x + 68, y + 122, 6, '±');
+    wire([[x + 68, y + 128], [x + 68, y + 138], [x + 4, y + 138], [x + 4, y + 122], [x + 8, y + 122]]);
+    andG(x + 74, y + 140, 16, 12); wire([[x + 82, y + 70], [x + 82, y + 76]]); wire([[x + 48, y + 116], [x + 72, y + 116], [x + 72, y + 143], [x + 74, y + 143]]);
+    tx('taken', x + 82, y + 158, 5.5);
+  },
+  fetch(b) {
+    const { x, y } = b;
+    wire([[x + 6, y + 40], [x + 20, y + 40]]); tx('redirect', x + 6, y + 37, 5.5, 'left');
+    wire([[x + 6, y + 52], [x + 20, y + 52]]); tx('pred', x + 6, y + 49, 5.5, 'left');
+    wire([[x + 150, y + 94], [x + 150, y + 102], [x + 12, y + 102], [x + 12, y + 64], [x + 20, y + 64]]);
+    mux(x + 20, y + 28, 16, 48, 3, 'NPC');
+    wire([[x + 41, y + 52], [x + 60, y + 52]]);
+    reg(x + 60, y + 38, 44, 28, 'PC', 9);
+    wire([[x + 104, y + 52], [x + 196, y + 52]]); dot(x + 122, y + 52);
+    wire([[x + 122, y + 52], [x + 122, y + 80], [x + 140, y + 80]]);
+    wire([[x + 128, y + 90], [x + 141, y + 88]]); tx('8', x + 124, y + 93, 6);
+    circ(x + 150, y + 84, 10, '+');
+    tx('→ icache', x + 196, y + 48, 6, 'right');
+    andG(x + 150, y + 28, 18, 12); tx('stall', x + 172, y + 37, 5.5, 'left');
+  },
+  fbuf(b) {
+    const { x, y, w } = b, sw = (w - 16) / 8;
+    for (let i = 0; i < 8; i++) { reg(x + 8 + i * sw + 1, y + 24, sw - 3, 28, 'e' + i, 6); wire([[x + 8 + i * sw + sw / 2, y + 52], [x + 8 + i * sw + sw / 2, y + 58]]); }
+    wire([[x + 8, y + 58], [x + 120, y + 58]]);
+    wire([[x + 30, y + 58], [x + 30, y + 72], [x + 55, y + 72]]); wire([[x + 30, y + 72], [x + 30, y + 92], [x + 85, y + 92]]);
+    mux(x + 55, y + 62, 12, 40, 3, '8:1'); mux(x + 85, y + 62, 12, 40, 3, '8:1');
+    tx('→ dec', x + 104, y + 108, 5.5);
+    reg(x + 130, y + 64, 36, 16, 'HEAD', 6); wire([[x + 166, y + 72], [x + 172, y + 72]]); circ(x + 179, y + 72, 7, '+');
+    reg(x + 130, y + 86, 36, 16, 'TAIL', 6); wire([[x + 166, y + 94], [x + 172, y + 94]]); circ(x + 179, y + 94, 7, '+');
+    box(x + 194, y + 74, 30, 14, 'FULL', 5.5); wire([[x + 186, y + 72], [x + 194, y + 78]]); wire([[x + 186, y + 94], [x + 194, y + 84]]);
+  },
+  dec0(b) { pla(b); }, dec1(b) { pla(b); },
+  memarb(b) {
+    const { x, y } = b;
+    [['ST', 34], ['LD', 48], ['IC', 62]].forEach(([n, o]) => { tx(n, x + 8, y + o + 2, 6, 'left'); wire([[x + 20, y + o], [x + 115, y + o]]); wire([[x + 20, y + o], [x + 20, y + o + 46 - (o - 34) * .5], [x + 40, y + o + 46 - (o - 34) * .5]]); });
+    box(x + 40, y + 74, 52, 28, 'PRIO ENC', 6);
+    wire([[x + 92, y + 88], [x + 228, y + 88]]);
+    [120, 170, 220].forEach((mx, i) => { wire([[mx + 8, y + 88], [mx + 8, y + 82]]); mux(mx, y + 26, 16, 50, 3, ['CMD', 'ADDR', 'DATA'][i]); });
+    for (let i = 0; i < 3; i++) wire([[136 + 110 + i * 50 + 5, y + 51], [x + 270, y + 51]]);
+    reg(x + 270, y + 30, 54, 44, 'OUT REG', 6);
+    wire([[x + 324, y + 52], [x + 350, y + 52]]); tx('→ mem', x + 337, y + 48, 5.5);
+    box(x + 360, y + 28, 80, 30, 'TAG ROUTE', 6);
+    for (let i = 0; i < 3; i++) wire([[x + 380 + i * 20, y + 58], [x + 380 + i * 20, y + 72]]);
+    tx('ic  ld  st', x + 400, y + 82, 5.5); tx('mem2proc_tag', x + 400, y + 24, 5.5);
+  },
+  mt(b) {
+    const { x, y } = b, gw = 170 / 8, gh = 35;
+    for (let j = 0; j < 4; j++) for (let i = 0; i < 8; i++) {
+      const xx = x + 4 + i * gw, yy = y + 24 + j * gh;
+      reg(xx + 1, yy + 2, gw - 3, gh - 10, 'x' + (j * 8 + i), 5.5);
+      ctx.fillStyle = rnd() < .7 ? C.gold : '#3a3448'; ctx.fillRect(xx + gw - 6, yy + 4, 2.5, 2.5);
+    }
+    wire([[x + 180, y + 24], [x + 180, y + 164]]);
+    ['T1a', 'T2a', 'T1b', 'T2b'].forEach((n, i) => { const my = y + 26 + i * 34; wire([[x + 180, my + 16], [x + 195, my + 16]]); mux(x + 200, my, 14, 30, 3, '32:1'); tx(n, x + 232, my + 13, 5.5); });
+  },
+  fl(b) {
+    const { x, y } = b, cw = 200 / 64;
+    for (let i = 0; i < 64; i++) {
+      ctx.fillStyle = i >= 32 && rnd() < .55 ? hsl(b.hue, 70, 58) : hsl(b.hue, 25, 20);
+      ctx.fillRect(x + 4 + i * cw + .3, y + 24, cw - .6, 14);
+      if (i % 16 === 0) tx('p' + i, x + 4 + i * cw, y + 48, 5.5, 'left');
+    }
+    box(x + 214, y + 21, 70, 13, 'PE → T0', 5.5); box(x + 214, y + 36, 70, 13, 'PE → T1', 5.5);
+    wire([[x + 204, y + 30], [x + 214, y + 28]]); wire([[x + 204, y + 32], [x + 214, y + 42]]);
+  },
+  bs(b) {
+    const { x, y } = b, sw = 58;
+    for (let i = 0; i < 4; i++) {
+      const xx = x + 6 + i * sw;
+      reg(xx, y + 22, sw - 6, 74, '', 6);
+      ['MT ×32', 'FL 64b', 'ROB_T', 'SQ_T'].forEach((n, k) => { tx(n, xx + (sw - 6) / 2, y + 34 + k * 14, 5.5); if (k) wire([[xx + 3, y + 25 + k * 14], [xx + sw - 9, y + 25 + k * 14]], INK, .4); });
+      tx('b' + i, xx + sw - 12, y + 92, 5.5, 'left', C.rust);
+      wire([[xx + sw - 6, y + 40 + i * 10], [x + 244, y + 40 + i * 10]], WIRE, .5);
+    }
+    mux(x + 250, y + 24, 16, 68, 4, 'RESTORE'); tx('bmask', x + 258, y + 100, 5.5);
+  },
+  rs(b) {
+    const { x, y } = b, rh = 150 / 8;
+    wire([[x + 136, y + 20], [x + 136, y + 176]], C.gold, .9); wire([[x + 144, y + 20], [x + 144, y + 176]], C.gold, .9);
+    tx('CDB', x + 140, y + 20, 5, 'center', C.gold);
+    for (let r = 0; r < 8; r++) {
+      const yy = y + 24 + r * rh, m = yy + rh / 2;
+      reg(x + 6, yy + 2, 22, rh - 4, 'op', 5.5); reg(x + 30, yy + 2, 20, rh - 4, 'T', 5.5);
+      reg(x + 52, yy + 2, 30, rh - 4, 'T1', 5.5); reg(x + 84, yy + 2, 30, rh - 4, 'T2', 5.5);
+      wire([[x + 82, yy + 5], [x + 150, yy + 5], [x + 154, m - 2]]); wire([[x + 114, yy + rh - 5], [x + 162, yy + rh - 5], [x + 166, m + 2]]);
+      dot(x + 136, yy + 5, C.gold); dot(x + 144, yy + rh - 5, C.gold);
+      circ(x + 158, m - 1, 4.5, '='); circ(x + 172, m + 1, 4.5, '=');
+      andG(x + 182, m - 5, 14, 10); wire([[x + 196, m], [x + 204, m]]);
+    }
+    box(x + 204, y + 24, 20, 150); vtx('PSEL ×2', x + 214, y + 99);
+    mux(x + 234, y + 28, 14, 66, 4, '8:1'); mux(x + 234, y + 104, 14, 66, 4, '8:1');
+    tx('iss0', x + 262, y + 58, 5, 'right'); tx('iss1', x + 262, y + 134, 5, 'right');
+  },
+  sq(b) {
+    ring(b);
+    const { x, y } = b;
+    wire([[x + 8, y + 24], [x + 8, y + 170]]); vtx('ld addr', x + 5, y + 140, 5);
+    for (let i = 0; i < 8; i++) { const yy = y + 30 + i * 17; wire([[x + 8, yy], [x + 16, yy]]); circ(x + 22, yy, 5, '='); dot(x + 8, yy); }
+    for (let i = 0; i < 4; i++) andG(x + 206, y + 30 + i * 18, 14, 10);
+    tx('age', x + 213, y + 108, 5.5);
+    box(x + 226, y + 26, 20, 80); vtx('FWD PE', x + 236, y + 66);
+    mux(x + 248, y + 116, 12, 40, 2, 'VAL'); tx('→ ld', x + 254, y + 172, 5.5);
+  },
+  prf(b) {
+    const { x, y, w } = b;
+    box(x + 4, y + 22, 16, 150); vtx('WL DEC 6→64', x + 12, y + 97);
+    bitcells(x + 24, y + 22, w - 28, 150, 64, 32, b.hue);
+    box(x + 24, y + 174, w - 28, 10, 'BITLINES · SENSE AMPS', 5.5);
+    for (let i = 0; i < 5; i++) { const mx = x + 34 + i * 58; wire([[mx - 5, y + 184], [mx - 5, y + 200]]); mux(mx, y + 190, 16, 50, 3, 'R' + i + ' 64:1'); }
+    tx(['rs1a', 'rs2a', 'rs1b', 'rs2b', 'commit'].join('  '), x + 150, y + 248, 5.5);
+    box(x + 340, y + 192, 46, 20, 'W0 DEC', 6); box(x + 340, y + 218, 46, 20, 'W1 DEC', 6);
+    andG(x + 396, y + 196, 18, 12); andG(x + 396, y + 222, 18, 12);
+    tx('cdb_reg', x + 430, y + 210, 5.5, 'center', C.gold);
+  },
+  alu0(b) { alu(b); }, alu1(b) { alu(b); },
+  bru(b) {
+    const { x, y } = b;
+    tx('rs1', x + 4, y + 30, 5.5, 'left'); tx('rs2', x + 4, y + 82, 5.5, 'left');
+    ['=', '<', '<u'].forEach((s, i) => { box(x + 14, y + 30 + i * 17, 22, 14, s, 7); wire([[x + 36, y + 37 + i * 17], [x + 44, y + 37 + i * 17]]); });
+    mux(x + 44, y + 28, 14, 52, 3, 'FUNC');
+    wire([[x + 63, y + 54], [x + 74, y + 54]]); tx('pred', x + 66, y + 76, 5.5); wire([[x + 66, y + 70], [x + 66, y + 60], [x + 74, y + 60]]);
+    orG(x + 76, y + 48, 18, 16, true); wire([[x + 94, y + 56], [x + 104, y + 56]]); vtx('mispred', x + 108, y + 56, 5);
+    tx('PC', x + 118, y + 30, 5.5); tx('imm', x + 118, y + 82, 5.5);
+    aluShape(x + 124, y + 30, 24, 40, '+');
+    wire([[x + 148, y + 50], [x + 160, y + 50]]); wire([[x + 150, y + 76], [x + 160, y + 76], [x + 160, y + 64]]); tx('PC+4', x + 150, y + 84, 5, 'left');
+    mux(x + 160, y + 34, 14, 42, 2, 'TGT'); tx('target', x + 192, y + 52, 5.5);
+  },
+  cdbarb(b) {
+    const { x, y } = b;
+    ['ALU0', 'ALU1', 'MULT', 'LOAD'].forEach((n, i) => { const yy = y + 30 + i * 13; tx(n, x + 4, yy + 2, 5.5, 'left'); wire([[x + 22, yy], [x + 40, yy]]); dot(x + 30, yy); wire([[x + 30, yy], [x + 30, y + 82], [x + 110, y + 82]], WIRE, .4); });
+    box(x + 40, y + 26, 42, 50, 'PSEL', 6); tx('4→2', x + 61, y + 54, 5.5);
+    wire([[x + 82, y + 40], [x + 110, y + 40]]); wire([[x + 82, y + 62], [x + 110, y + 62]]);
+    mux(x + 112, y + 24, 14, 30, 4, '4:1'); mux(x + 112, y + 56, 14, 30, 4, '4:1');
+    andG(x + 146, y + 32, 16, 12); andG(x + 146, y + 64, 16, 12); notG(x + 136, y + 76, 7, 6);
+    tx('CDB0', x + 190, y + 41, 6, 'center', C.gold); tx('CDB1', x + 190, y + 73, 6, 'center', C.gold);
+    wire([[x + 162, y + 38], [x + 178, y + 38]], C.gold); wire([[x + 162, y + 70], [x + 178, y + 70]], C.gold);
+  },
+  mult(b) {
+    const { x, y } = b, sw = (b.w - 8) / 4;
+    for (let i = 0; i < 4; i++) {
+      const sx = x + 4 + i * sw;
+      tx('b[' + (8 * i + 7) + ':' + 8 * i + ']', sx + 22, y + 32, 5.5);
+      circ(sx + 22, y + 50, 10, '×');
+      box(sx + 8, y + 74, 30, 14, '<<8', 6);
+      wire([[sx + 32, y + 50], [sx + 44, y + 44]]); wire([[sx + 38, y + 81], [sx + 40, y + 81], [sx + 40, y + 60], [sx + 44, y + 60]]);
+      aluShape(sx + 44, y + 32, 22, 38, '+');
+      wire([[sx + 66, y + 51], [sx + 80, y + 37]]);
+      reg(sx + 80, y + 26, 20, 20, 'P', 6); reg(sx + 80, y + 50, 20, 20, 'A', 6); reg(sx + 80, y + 74, 20, 20, 'B', 6);
+      if (i < 3) wire([[sx + 100, y + 60], [sx + sw + 4, y + 60]]);
+      tx('S' + (i + 1), sx + 8, y + b.h - 6, 7, 'left');
+    }
+  },
+  ldu(b) {
+    const { x, y } = b;
+    const S = { IDLE: [44, 66], SQ: [104, 44], WAIT: [104, 112], MEM: [168, 66], CDB: [222, 112] };
+    const R = 16;
+    [['IDLE', 'SQ'], ['SQ', 'WAIT'], ['SQ', 'MEM'], ['WAIT', 'MEM'], ['MEM', 'CDB'], ['CDB', 'IDLE']].forEach(([a, c]) => arrow(x + S[a][0], y + S[a][1], x + S[c][0], y + S[c][1], R, R));
+    ctx.strokeStyle = WIRE; ['WAIT', 'MEM'].forEach(n => { ctx.beginPath(); ctx.arc(x + S[n][0] + 12, y + S[n][1] + 14, 7, -.3, 4); ctx.stroke(); });
+    Object.entries(S).forEach(([n, [sx, sy]]) => { circ(x + sx, y + sy, R, ''); tx(n, x + sx, y + sy + 2.5, 6.5); });
+    tx('fwd hit', x + 140, y + 50, 5, 'left'); tx('older st?', x + 108, y + 82, 5, 'left'); tx('tag match', x + 196, y + 86, 5, 'left');
+    tx('ld_tag', x + 256, y + 38, 5.5); tx('mem_tag', x + 256, y + 72, 5.5);
+    wire([[x + 256, y + 42], [x + 256, y + 50], [x + 262, y + 50]]); wire([[x + 256, y + 66], [x + 256, y + 58], [x + 262, y + 58]]);
+    circ(x + 270, y + 54, 8, '=');
+    wire([[x + 278, y + 54], [x + 290, y + 54], [x + 290, y + 100], [x + 307, y + 100], [x + 307, y + 88]]);
+    tx('SQ fwd', x + 300, y + 32, 5.5); mux(x + 300, y + 38, 14, 44, 2, 'SRC');
+    mux(x + 330, y + 34, 14, 52, 4, 'BYTE'); box(x + 360, y + 50, 32, 20, 'SEXT', 6);
+    wire([[x + 392, y + 60], [x + 400, y + 60]]); reg(x + 400, y + 46, 42, 28, 'RESULT', 6);
+    andG(x + 330, y + 108, 18, 12); notG(x + 350, y + 108, 10, 12); tx('squash: bmask & mispredict', x + 340, y + 134, 5.5);
+  },
+  ireg(b) { flopRow(b.x + 66, b.y + 5, b.w - 70, b.h - 10, 24); },
+  creg(b) { flopRow(b.x + 66, b.y + 5, b.w - 70, b.h - 10, 24); },
+};
+function flopRow(x, y, w, h, n) { const fw = w / n; for (let i = 0; i < n; i++) reg(x + i * fw + .5, y, fw - 1.5, h, ''); }
+function pla(b) {
+  const { x, y } = b;
+  const nin = 10, nprod = 12, nout = 7;
+  for (let i = 0; i < nin; i++) { const ix = x + 12 + i * 7; wire([[ix, y + 28], [ix, y + 124]]); }
+  tx('op[6:0] f3', x + 44, y + 26, 5.5);
+  for (let p = 0; p < nprod; p++) {
+    const py = y + 33 + p * 7.6;
+    wire([[x + 8, py], [x + 82, py]], WIRE, .5);
+    for (let i = 0; i < nin; i++) if (rnd() < .35) dot(x + 12 + i * 7, py);
+    andG(x + 82, py - 3, 10, 6);
+    wire([[x + 92, py], [x + 104 + (nout - 1) * 7, py]], WIRE, .5);
+    for (let o = 0; o < nout; o++) if (rnd() < .3) dot(x + 104 + o * 7, py);
+  }
+  for (let o = 0; o < nout; o++) {
+    const ox = x + 104 + o * 7; wire([[ox, y + 28], [ox, y + 126]]);
+    ctx.save(); ctx.translate(ox + 3, y + 126); ctx.rotate(Math.PI / 2); orG(0, 0, 8, 6); ctx.restore();
+  }
+  tx('AND', x + 47, y + 138, 5.5); tx('OR', x + 125, y + 142, 5.5);
+  ['alu_func', 'opa_sel', 'opb_sel', 'rd_mem', 'wr_mem', 'cond_br', 'mult', 'halt'].forEach((n, i) => tx(n, x + 160, y + 34 + i * 8, 5.5, 'left'));
+  mux(x + 178, y + 102, 14, 40, 5, 'IMM');
+}
+function alu(b) {
+  const { x, y } = b;
+  tx('rs1|PC', x + 4, y + 30, 5, 'left'); tx('rs2|imm', x + 4, y + 124, 5, 'left');
+  mux(x + 10, y + 34, 14, 34, 2, 'OPA'); mux(x + 10, y + 76, 14, 34, 2, 'OPB');
+  wire([[x + 29, y + 51], [x + 34, y + 51], [x + 34, y + 112]]); wire([[x + 29, y + 93], [x + 38, y + 93], [x + 38, y + 30]]);
+  aluShape(x + 46, y + 26, 26, 32, '±');
+  box(x + 46, y + 64, 28, 16, '<< >>', 6);
+  box(x + 46, y + 86, 28, 16, 'SLT', 6);
+  andG(x + 84, y + 28, 16, 10); orG(x + 84, y + 44, 16, 10); orG(x + 86, y + 60, 14, 10, true);
+  [[x + 34, y + 36], [x + 38, y + 48], [x + 34, y + 72], [x + 38, y + 94]].forEach(([wx, wy]) => { dot(wx, wy); wire([[wx, wy], [x + 46, wy]]); });
+  [[x + 72, y + 42], [x + 74, y + 72], [x + 74, y + 94], [x + 100, y + 33], [x + 100, y + 49], [x + 100, y + 65]].forEach(([ox, oy], i) => wire([[ox, oy], [x + 118, oy], [x + 118, y + 36 + i * 11], [x + 128, y + 36 + i * 11]]));
+  mux(x + 130, y + 26, 16, 84, 8, 'RESULT 8:1');
+  wire([[x + 151, y + 68], [x + 211, y + 68]]); tx('→ CDB', x + 200, y + 64, 5.5, 'right');
+  box(x + 160, y + 96, 44, 16, 'FUNC DEC', 5.5); wire([[x + 160, y + 104], [x + 138, y + 104], [x + 138, y + 110]]);
+}
+
+function frameBlock(b) {
+  ctx.strokeStyle = hsl(b.hue, 40, 55, .55); ctx.lineWidth = 1; ctx.strokeRect(b.x + .5, b.y + .5, b.w - 1, b.h - 1);
+  ctx.strokeStyle = hsl(45, 50, 60, .18); ctx.strokeRect(b.x - 3.5, b.y - 3.5, b.w + 7, b.h + 7);
+  // label plate
+  ctx.font = `500 10px ${MONO}`;
+  if ('letterSpacing' in ctx) ctx.letterSpacing = '1.5px';
+  const lw = ctx.measureText(b.label).width;
+  ctx.fillStyle = '#07060ccc'; ctx.fillRect(b.x + 1, b.y + 1, lw + 12, 16);
+  ctx.fillStyle = hsl(b.hue, 60, 78); ctx.fillText(b.label, b.x + 6, b.y + 12);
+  if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+  if (b.sub) { ctx.font = `8px ${MONO}`; ctx.fillStyle = hsl(b.hue, 25, 62, .9); ctx.fillText(b.sub, b.x + lw + 18, b.y + 12); }
+}
+
+// ---------- nets (manhattan polylines) ----------
+const NETS = [
+  // memory / teal
+  { c: C.teal, n: 8, p: [[200,410],[200,440]] },
+  { c: C.teal, n: 10, p: [[120,960],[120,940],[96,940],[96,260],[110,260]] },
+  { c: C.teal, n: 6, p: [[444,170],[460,170]] },
+  { c: C.teal, n: 12, p: [[1045,940],[1045,1030],[560,1030]] },
+  { c: C.teal, n: 10, p: [[1465,940],[1465,1056],[560,1056]] },
+  { c: C.teal, n: 6, p: [[1240,900],[1180,900]] },
+  { c: C.teal, n: 16, p: [[335,1070],[335,1140]] },
+  // fetch path / ice
+  { c: C.ice, n: 8, p: [[310,495],[330,495]] },
+  { c: C.ice, n: 6, p: [[400,550],[400,566],[217,566],[217,580]] },
+  { c: C.ice, n: 6, p: [[480,550],[480,580]] },
+  { c: C.ice, n: 3, p: [[460,345],[440,345],[440,426],[260,426],[260,440]] },
+  // dispatch / ice
+  { c: C.ice, n: 12, p: [[560,660],[592,660],[592,200],[620,200]] },
+  { c: C.ice, n: 12, p: [[592,520],[620,520]] },
+  { c: C.ice, n: 12, p: [[592,660],[592,850],[620,850]] },
+  { c: C.ice, n: 6, p: [[592,880],[592,1115],[620,1115]], ghost: true },
+  { c: C.ice, n: 8, p: [[870,140],[890,140]] },
+  // issue / magenta
+  { c: C.magenta, n: 14, p: [[755,940],[755,1000],[1214,1000],[1214,455],[1240,455]] },
+  { c: C.magenta, n: 10, p: [[1214,705],[1240,705]] },
+  { c: C.magenta, n: 8, p: [[1214,865],[1240,865]] },
+  { c: C.magenta, n: 8, p: [[700,1000],[700,1100]] },
+  // regfile read ports / teal-ish
+  { c: C.teal, n: 10, p: [[1347,360],[1347,390]] },
+  { c: C.teal, n: 10, p: [[1582,360],[1582,390]] },
+  { c: C.teal, n: 6, p: [[1300,520],[1300,540]] },
+  // results into arbiter / gold thin
+  { c: C.gold, n: 6, p: [[1582,520],[1582,540]] },
+  { c: C.gold, n: 6, p: [[1455,600],[1475,600]] },
+  { c: C.gold, n: 6, p: [[1582,650],[1582,630]] },
+  { c: C.gold, n: 6, p: [[1690,860],[1700,860],[1700,615],[1690,615]] },
+  // commit / retire
+  { c: C.copper, n: 8, p: [[1000,300],[1000,162]] },
+  { c: C.copper, n: 6, p: [[1080,740],[1080,760]] },
+  { c: C.copper, n: 8, p: [[1180,240],[1240,240]] },
+  // mispredict / rust
+  { c: C.rust, n: 4, p: [[1240,590],[1226,590],[1226,90],[580,90],[580,330],[560,330]] },
+  { c: C.rust, n: 4, p: [[580,470],[560,470]] },
+  { c: C.rust, n: 4, p: [[1035,90],[1035,178]] },
+  { c: C.rust, n: 3, p: [[1226,742],[1180,742]] },
+];
+// the two CDB rails: a loop around the core
+const CDB = [[1690,585],[1712,585],[1712,235],[1690,235]];
+const CDB2 = [[1712,585],[1712,950],[604,950],[604,240],[620,240]];
+const CDB_DROPS = [[[700,950],[700,940]], [[900,950],[900,740]], [[1045,950],[1045,940]], [[604,320],[620,320]]];
+
+function offsetPoly(p, d) {
+  const out = [];
+  const nrm = (a, b) => { const dx = Math.sign(b[0] - a[0]), dy = Math.sign(b[1] - a[1]); return [-dy * d, dx * d]; };
+  for (let i = 0; i < p.length; i++) {
+    const n1 = i > 0 ? nrm(p[i - 1], p[i]) : null, n2 = i < p.length - 1 ? nrm(p[i], p[i + 1]) : null;
+    let ox, oy;
+    if (n1 && n2) { const same = n1[0] === n2[0] && n1[1] === n2[1]; ox = same ? n1[0] : n1[0] + n2[0]; oy = same ? n1[1] : n1[1] + n2[1]; }
+    else { const n = n1 || n2; ox = n[0]; oy = n[1]; }
+    out.push([p[i][0] + ox, p[i][1] + oy]);
+  }
+  return out;
+}
+function drawBundle(p, col, n, spacing = 1.6, alpha = .7) {
+  for (let k = 0; k < n; k++) {
+    const q = offsetPoly(p, (k - (n - 1) / 2) * spacing);
+    ctx.strokeStyle = col; ctx.globalAlpha = alpha * (.55 + .45 * ((k * 7) % 5) / 4); ctx.lineWidth = .7;
+    ctx.beginPath(); q.forEach((pt, i) => i ? ctx.lineTo(pt[0], pt[1]) : ctx.moveTo(pt[0], pt[1])); ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  // vias at ends
+  [p[0], p[p.length - 1]].forEach(pt => { ctx.fillStyle = col; ctx.globalAlpha = .9; ctx.fillRect(pt[0] - 2, pt[1] - 2, 4, 4); ctx.globalAlpha = 1; });
+}
+function drawRail(p, w) {
+  ctx.lineCap = 'square'; ctx.lineJoin = 'miter';
+  ctx.strokeStyle = '#3a2a0a'; ctx.lineWidth = w + 4; strokePoly(p);
+  ctx.strokeStyle = C.gold; ctx.lineWidth = w; strokePoly(p);
+  ctx.strokeStyle = '#fff3c4'; ctx.globalAlpha = .45; ctx.lineWidth = 1; strokePoly(offsetPoly(p, -w / 4)); ctx.globalAlpha = 1;
+  ctx.lineCap = 'butt';
+}
+function strokePoly(p) { ctx.beginPath(); p.forEach((pt, i) => i ? ctx.lineTo(pt[0], pt[1]) : ctx.moveTo(pt[0], pt[1])); ctx.stroke(); }
+
+// ---------- die furniture ----------
+const PADS = {
+  top: ['VDD','clock','reset','VSS','mem2proc_tag[3:0]','VDD','mem2proc_data[63:0]','mem2proc_data_tag','VSS','VDD','commit[0].valid','commit[0].NPC','VSS','commit[0].data','commit[1].valid','VDD','commit[1].NPC','commit[1].data','VSS','halt','VDD'],
+  bottom: ['VSS','proc2mem_cmd[1:0]','proc2mem_addr[31:0]','VDD','proc2mem_data[63:0]','proc2mem_size','VSS','VDD','scan_in','scan_out','VSS','test_en','VDD','VSS','VDD','VSS','VDD'],
+  side: ['VDD','VSS','VDD','VSS','VDD','VSS','VDD','VSS','VDD','VSS','VDD','VSS','VDD','VSS'],
+};
+function pads() {
+  const drawPad = (x, y, name, rot) => {
+    const pw = 24;
+    ctx.fillStyle = '#2b2416'; ctx.fillRect(x - pw / 2 - 2, y - pw / 2 - 2, pw + 4, pw + 4);
+    const g = ctx.createLinearGradient(x - pw / 2, y - pw / 2, x + pw / 2, y + pw / 2);
+    g.addColorStop(0, '#e9d08a'); g.addColorStop(.5, '#a8853c'); g.addColorStop(1, '#6f5420');
+    ctx.fillStyle = g; ctx.fillRect(x - pw / 2, y - pw / 2, pw, pw);
+    // bond wire stub & probe scuff
+    ctx.fillStyle = '#ffffff30'; ctx.beginPath(); ctx.ellipse(x + (rnd() - .5) * 6, y + (rnd() - .5) * 6, 4, 2.5, rnd() * 3, 0, 7); ctx.fill();
+    ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
+    ctx.font = `6.5px ${MONO}`; ctx.fillStyle = name.startsWith('V') ? '#8f87a3' : '#f1dfae'; ctx.textAlign = 'center';
+    ctx.fillText(name, 0, 22); ctx.restore(); ctx.textAlign = 'left';
+  };
+  const span = (n, a, b) => Array.from({ length: n }, (_, i) => a + (b - a) * (i + .5) / n);
+  span(PADS.top.length, 90, 1710).forEach((x, i) => drawPad(x, 78, PADS.top[i], 0));
+  span(PADS.bottom.length, 90, 1710).forEach((x, i) => drawPad(x, 1162, PADS.bottom[i], Math.PI));
+  span(PADS.side.length, 140, 1100).forEach((y, i) => { drawPad(78, y, PADS.side[i], -Math.PI / 2); drawPad(1722, y, PADS.side[(i + 1) % 2 ? i : i], Math.PI / 2); });
+}
+
+function sealRing() {
+  for (let k = 0; k < 6; k++) {
+    ctx.strokeStyle = k % 2 ? '#5a4a2a' : '#b89a55'; ctx.globalAlpha = .35 + k * .08; ctx.lineWidth = k === 3 ? 2 : .8;
+    ctx.strokeRect(46 + k * 2.4, 46 + k * 2.4, W - 92 - k * 4.8, H - 92 - k * 4.8);
+  }
+  ctx.globalAlpha = 1;
+  // corner alignment marks
+  [[60, 60], [W - 60, 60], [60, H - 60], [W - 60, H - 60]].forEach(([x, y]) => {
+    ctx.strokeStyle = '#d9b45a88'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x - 10, y); ctx.lineTo(x + 10, y); ctx.moveTo(x, y - 10); ctx.lineTo(x, y + 10); ctx.stroke();
+    ctx.strokeRect(x - 4, y - 4, 8, 8);
+  });
+}
+
+function fill() {
+  // filler cells and decap everywhere between blocks: the "sea"
+  ctx.save();
+  ctx.beginPath(); ctx.rect(96, 96, W - 192, H - 192);
+  for (const b of Object.values(B)) ctx.rect(b.x + b.w + 4, b.y - 4, -(b.w + 8), b.h + 8);
+  ctx.clip('evenodd');
+  for (let y = 96; y < H - 96; y += 4) {
+    ctx.fillStyle = `hsla(255,30%,${10 + (y % 8 === 0) * 3}%,1)`; ctx.fillRect(96, y, W - 192, 3.2);
+  }
+  ctx.globalAlpha = .4;
+  for (let i = 0; i < 9000; i++) { ctx.fillStyle = hsl(240 + rnd() * 60, 30, 20 + rnd() * 15); ctx.fillRect(96 + rnd() * (W - 192), 96 + Math.floor(rnd() * (H - 192) / 4) * 4, 1 + rnd() * 5, 3); }
+  ctx.globalAlpha = 1; ctx.restore();
+}
+
+function powerGrid() {
+  // top metal power straps, faint, over everything
+  ctx.globalAlpha = .07;
+  for (let x = 130; x < W - 100; x += 60) { ctx.fillStyle = x % 120 ? '#c8794a' : '#d9b45a'; ctx.fillRect(x, 96, 5, H - 192); }
+  for (let y = 130; y < H - 100; y += 60) { ctx.fillStyle = '#b89a55'; ctx.fillRect(96, y, W - 192, 3); }
+  ctx.globalAlpha = 1;
+}
+
+function sheen() {
+  ctx.save();
+  ctx.globalCompositeOperation = 'soft-light';
+  const g = ctx.createLinearGradient(0, 0, W, H);
+  ['#ff3b8d', '#ffb347', '#6cf0c2', '#4f8cff', '#b45cff', '#ff3b8d'].forEach((c, i, a) => g.addColorStop(i / (a.length - 1), c));
+  ctx.globalAlpha = .2; ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  const g2 = ctx.createRadialGradient(W * .32, H * .25, 50, W * .32, H * .25, 900);
+  g2.addColorStop(0, '#ffffff'); g2.addColorStop(1, '#00000000');
+  ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = .12; ctx.fillStyle = g2; ctx.fillRect(0, 0, W, H);
+  ctx.restore();
+  // vignette
+  const v = ctx.createRadialGradient(W / 2, H / 2, 400, W / 2, H / 2, 1150);
+  v.addColorStop(0, '#00000000'); v.addColorStop(1, '#000000aa');
+  ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
+}
+
+function doodle() {
+  // chip art: the headthrob logo etched into the top metal near the corner
+  const x = 1610, y = 1072, s = .16;
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+  // silhouette: solid head and dome body in one flat etched tone, no glow
+  ctx.fillStyle = '#d9c48ecc';
+  ctx.beginPath(); ctx.arc(0, -30, 66, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(0, 160, 90, 100, 0, Math.PI, 2 * Math.PI); ctx.closePath(); ctx.fill();
+  ctx.restore();
+  ctx.font = `7px ${MONO}`; ctx.fillStyle = '#f1dfae99'; ctx.textAlign = 'center'; ctx.fillText('g5 was here', x, y + 37); ctx.textAlign = 'left';
+  for (let i = 0; i < 14; i++) { ctx.fillStyle = '#f1dfae' + (40 + Math.floor(rnd() * 80)).toString(16); ctx.fillRect(x - 60 + rnd() * 140, y - 30 + rnd() * 50, 1, 1); }
+}
+
+function markings() {
+  ctx.font = `800 30px ${DISP}`; ctx.fillStyle = '#e9d08a';
+  if ('letterSpacing' in ctx) ctx.letterSpacing = '3px';
+  ctx.globalAlpha = .9; ctx.fillText('R10K·2W', 1240, 1018);
+  if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+  ctx.font = `8px ${MONO}`; ctx.fillStyle = '#c9b88a';
+  ['EECS472 F26 GROUP 5  ·  RV32IM OoO', 'MASK REV A0  ·  N=2  ROB=32  PRF=64', '© 2026  ·  NOT FOR FABRICATION'].forEach((t, i) => ctx.fillText(t, 1242, 1036 + i * 12));
+  ctx.globalAlpha = 1;
+  // mask layer legend strip
+  // CDB legend on rail
+  ctx.save(); ctx.translate(1724, 760); ctx.rotate(Math.PI / 2); ctx.font = `600 9px ${MONO}`; ctx.fillStyle = C.gold; ctx.fillText('CDB[1:0]  ·  {tag, preg, value, valid} × 2', 0, 0); ctx.restore();
+  ctx.font = `600 8px ${MONO}`; ctx.fillStyle = C.ice; ctx.save(); ctx.translate(586, 420); ctx.rotate(-Math.PI / 2); ctx.fillText('DISPATCH_PACKET × 2', 0, 0); ctx.restore();
+  ctx.fillStyle = C.magenta; ctx.fillText('ISSUE_PACKET × 2', 905, 996);
+  ctx.fillStyle = C.rust; ctx.fillText('MISPREDICT · REDIRECT_PC · BMASK', 700, 86);
+  ctx.fillStyle = C.teal; ctx.fillText('LD / ST → MEM_ARB', 620, 1026);
+  // region titles
+  ctx.font = `300 13px ${DISP}`; ctx.fillStyle = '#8f87a3'; if ('letterSpacing' in ctx) ctx.letterSpacing = '6px';
+  ctx.fillText('FRONTEND', 112, 760); ctx.fillText('RENAME · SCHEDULE · RETIRE', 622, 1090); ctx.fillText('EXECUTE', 1242, 960);
+  if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+}
+
+function grain() {
+  const img = ctx.getImageData(0, 0, die.width, die.height), d = img.data;
+  for (let i = 0; i < d.length; i += 4) { const n = (rnd() - .5) * 14; d[i] += n; d[i + 1] += n; d[i + 2] += n; }
+  ctx.putImageData(img, 0, 0);
+}
+
+function render() {
+  ctx.fillStyle = '#050409'; ctx.fillRect(0, 0, W, H);
+  // die body
+  const dg = ctx.createLinearGradient(40, 40, W - 40, H - 40);
+  dg.addColorStop(0, '#1b1730'); dg.addColorStop(.5, '#120f22'); dg.addColorStop(1, '#1a1222');
+  ctx.fillStyle = dg; ctx.fillRect(40, 40, W - 80, H - 80);
+  fill();
+  for (const [k, b] of Object.entries(B)) {
+    base(b);
+    INK = hsl(b.hue, 45, 84); WIRE = hsl(b.hue, 30, 64);
+    if (SCH[k]) { if (k !== 'icache' && k !== 'prf' && k !== 'sq') dim(b); SCH[k](b); }
+    else (painters[b.kind] || painters.logic)(b);
+  }
+  powerGrid();
+  for (const n of NETS) drawBundle(n.p, n.c, n.n, 1.6, n.ghost ? .35 : .75);
+  for (const d of CDB_DROPS) { drawRail(d[0][1] < d[1][1] ? d : d, 3); }
+  drawRail(CDB, 5); drawRail(CDB2, 5);
+  for (const b of Object.values(B)) frameBlock(b);
+  pads(); sealRing(); doodle(); markings();
+  sheen();
+  grain();
+}
+
+// ---------- animated layer: tokens on the wires ----------
+function polyLen(p) { let L = 0; for (let i = 1; i < p.length; i++) L += Math.abs(p[i][0] - p[i - 1][0]) + Math.abs(p[i][1] - p[i - 1][1]); return L; }
+function along(p, t) {
+  let L = polyLen(p) * t;
+  for (let i = 1; i < p.length; i++) {
+    const s = Math.abs(p[i][0] - p[i - 1][0]) + Math.abs(p[i][1] - p[i - 1][1]);
+    if (L <= s) { const f = s ? L / s : 0; return [p[i - 1][0] + (p[i][0] - p[i - 1][0]) * f, p[i - 1][1] + (p[i][1] - p[i - 1][1]) * f]; }
+    L -= s;
+  }
+  return p[p.length - 1];
+}
+const cdbLoop = [[1690,585],[1712,585],[1712,950],[604,950],[604,240],[620,240]];
+const TRACKS = [
+  ...NETS.filter(n => !n.ghost && polyLen(n.p) > 60).map(n => ({ p: n.p, c: n.c, speed: 90 + polyLen(n.p) * .05, k: 1 + (polyLen(n.p) > 600) })),
+  { p: cdbLoop, c: '#fff1bf', speed: 260, k: 4, big: true },
+  { p: CDB, c: '#fff1bf', speed: 160, k: 1, big: true },
+];
+TRACKS.forEach(t => { t.L = polyLen(t.p); t.ph = Array.from({ length: t.k }, (_, i) => i / t.k + rnd() * .1); });
+let mispredFlash = 0;
+function frame(ts) {
+  const s = ts / 1000;
+  fctx.clearRect(0, 0, W, H);
+  fctx.globalCompositeOperation = 'lighter';
+  for (const t of TRACKS) {
+    for (const ph of t.ph) {
+      const u = ((s * t.speed / t.L) + ph) % 1;
+      const [x, y] = along(t.p, u);
+      const r = t.big ? 9 : 5;
+      const g = fctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, t.c); g.addColorStop(1, 'transparent');
+      fctx.fillStyle = g; fctx.beginPath(); fctx.arc(x, y, r, 0, 7); fctx.fill();
+    }
+  }
+  // ROB retire heartbeat
+  const beat = (Math.sin(s * 2.2) + 1) / 2;
+  const rb = B.rob, cx = rb.x + rb.w / 2, cy = rb.y + rb.h / 2 + 8;
+  fctx.strokeStyle = `rgba(217,180,90,${.08 + beat * .12})`; fctx.lineWidth = 2;
+  fctx.beginPath(); fctx.arc(cx, cy, 190 + beat * 4, 0, 7); fctx.stroke();
+  // occasional mispredict: a red pulse sweeps the recovery wire
+  const cyc = s % 9;
+  if (cyc < 1.2) {
+    const p = NETS.find(n => n.c === C.rust).p, u = cyc / 1.2;
+    fctx.strokeStyle = `rgba(226,87,76,${.9 * (1 - u)})`; fctx.lineWidth = 3;
+    fctx.beginPath(); const N = 40; for (let i = 0; i <= N; i++) { const [x, y] = along(p, u * i / N); i ? fctx.lineTo(x, y) : fctx.moveTo(x, y); } fctx.stroke();
+    const bs = B.bs; fctx.fillStyle = `rgba(226,87,76,${.18 * (1 - u)})`; fctx.fillRect(bs.x, bs.y, bs.w, bs.h);
+  }
+  fctx.globalCompositeOperation = 'source-over';
+  requestAnimationFrame(frame);
+}
+
+// ---------- hover plates ----------
+const mat = document.getElementById('mat'), tip = document.getElementById('tip'), hit = document.getElementById('hit');
+function locate(ev) {
+  const r = hit.getBoundingClientRect();
+  const x = (ev.clientX - r.left) / r.width * W, y = (ev.clientY - r.top) / r.height * H;
+  for (const [k, b] of Object.entries(B)) if (x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) return { b, px: ev.clientX - r.left, py: ev.clientY - r.top, r };
+  return null;
+}
+function show(ev) {
+  const h = locate(ev);
+  if (!h) { tip.hidden = true; return; }
+  const { b } = h;
+  tip.innerHTML = `<b>${b.label}</b><span class="file">${b.file} · ${b.loc} lines</span><p>${b.desc}</p>`;
+  tip.hidden = false;
+  const tw = tip.offsetWidth, th = tip.offsetHeight;
+  let lx = h.px + 18, ly = h.py + 18;
+  if (lx + tw > h.r.width) lx = Math.max(4, h.px - tw - 18);
+  if (ly + th > h.r.height) ly = Math.max(4, h.py - th - 18);
+  tip.style.left = lx + 'px'; tip.style.top = ly + 'px';
+}
+hit.addEventListener('pointermove', show);
+hit.addEventListener('pointerdown', show);
+hit.addEventListener('pointerleave', () => { tip.hidden = true; });
+
+const go = () => {
+  render();
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) requestAnimationFrame(frame);
+};
+(document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1500))]) : Promise.resolve()).then(go);
+})();
+</script>
+</body>
+</html>
