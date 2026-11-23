@@ -1,0 +1,200 @@
+---
+import Prompt from "./Prompt.astro";
+
+// Renders the projects as `tree` command output.
+// Tree guides are drawn with CSS (not box-drawing characters) so the
+// vertical lines stay continuous when a description wraps onto more lines.
+
+type Guide = "pipe" | "blank" | "tee" | "elbow";
+
+interface Project {
+  name: string;
+  href: string;
+  github?: string;
+  private?: boolean;
+  blurb?: string;
+  files?: string[];
+}
+
+interface Category {
+  dir: string;
+  color: string; // color for the project names in this directory
+  projects: Project[];
+}
+
+const tree: Category[] = [
+  {
+    dir: "featured",
+    color: "text-green",
+    projects: [
+      {
+        name: "ooo-riscv-cpu",
+        href: "/projects/ooo-cpu",
+        github: "https://github.com/marco-boone/",
+        private: true,
+        blurb: "out-of-order RISC-V core in SystemVerilog",
+      },
+      {
+        name: "mimu-glove",
+        href: "/projects/mimu-glove",
+        github: "https://github.com/marco-boone/373fp",
+        blurb: "gesture-controlled audio glove on an STM32",
+      },
+      {
+        name: "neural-network",
+        href: "/projects/neural-network",
+        github: "https://github.com/marcoboone/Atombots_Simulation_ML_GA",
+        blurb: "from-scratch neural net in C#, trained by a genetic algorithm",
+      },
+    ],
+  },
+  {
+    dir: "course",
+    color: "text-mauve",
+    projects: [
+      {
+        name: "lc2k-cpu",
+        href: "https://github.com/marco-boone/",
+        private: true,
+        blurb: "pipelined LC2K processor in SystemVerilog",
+        files: [
+          "out-of-order micro-op queue",
+          "bimodal branch prediction with banked BTB",
+          "direct-mapped I-cache",
+          "1.6 CPI, 18.9 ns per instruction",
+        ],
+      },
+    ],
+  },
+  {
+    dir: "career",
+    color: "text-peach",
+    projects: [
+      {
+        name: "platformer",
+        href: "https://github.com/marco-boone/3DPrintingPlatformer",
+        blurb: "Unity platformer about 3D printing",
+      },
+    ],
+  },
+  {
+    dir: "personal",
+    color: "text-sky",
+    projects: [
+      {
+        name: "minventory",
+        href: "https://github.com/marco-boone/minventory",
+        private: true,
+        blurb: "spending tracker web app",
+      },
+    ],
+  },
+];
+
+type Row =
+  | { kind: "category"; guides: Guide[]; dir: string }
+  | { kind: "project"; guides: Guide[]; project: Project; color: string; hasDetails: boolean }
+  | { kind: "blurb"; guides: Guide[]; text: string }
+  | { kind: "links"; guides: Guide[]; href: string; github: string }
+  | { kind: "file"; guides: Guide[]; name: string }
+  | { kind: "spacer"; guides: Guide[] };
+
+const rows: Row[] = [];
+let dirCount = 0;
+let fileCount = 0;
+
+tree.forEach((cat, ci) => {
+  const catLast = ci === tree.length - 1;
+  rows.push({ kind: "category", guides: [catLast ? "elbow" : "tee"], dir: cat.dir });
+  dirCount++;
+  const catPrefix: Guide[] = [catLast ? "blank" : "pipe"];
+
+  cat.projects.forEach((p, pi) => {
+    const last = pi === cat.projects.length - 1;
+    const hasDetails = p.href.startsWith("/");
+    rows.push({
+      kind: "project",
+      guides: [...catPrefix, last ? "elbow" : "tee"],
+      project: p,
+      color: cat.color,
+      hasDetails,
+    });
+    dirCount++;
+
+    const own: Guide[] = [...catPrefix, last ? "blank" : "pipe"];
+    const files = p.files ?? [];
+    const infoGuides: Guide[] = [...own, files.length ? "pipe" : "blank"];
+
+    if (p.blurb) rows.push({ kind: "blurb", guides: infoGuides, text: p.blurb });
+    if (hasDetails && p.github)
+      rows.push({ kind: "links", guides: infoGuides, href: p.href, github: p.github });
+
+    files.forEach((f, fi) => {
+      rows.push({
+        kind: "file",
+        guides: [...own, fi === files.length - 1 ? "elbow" : "tee"],
+        name: f,
+      });
+      fileCount++;
+    });
+
+    const isFinal = catLast && last;
+    if (!isFinal) rows.push({ kind: "spacer", guides: own });
+  });
+});
+
+const line = "absolute left-[0.5ch] w-px bg-overlay1";
+const arm = "absolute left-[0.5ch] top-[0.5lh] h-px w-[2.75ch] bg-overlay1";
+---
+
+<div class="flex flex-col">
+  <Prompt command="tree projects" class="mb-4" />
+
+  <p class="font-bold text-blue">projects/</p>
+
+  {
+    rows.map((row) => (
+      <div class="flex">
+        {row.guides.map((g) => (
+          <span class="relative w-[4ch] shrink-0" aria-hidden="true">
+            {(g === "pipe" || g === "tee") && <span class:list={[line, "inset-y-0"]} />}
+            {g === "elbow" && <span class:list={[line, "top-0 h-[0.5lh]"]} />}
+            {(g === "tee" || g === "elbow") && <span class={arm} />}
+          </span>
+        ))}
+
+        <div class="min-w-0 flex-1">
+          {row.kind === "category" && <span class="font-bold text-blue">{row.dir}/</span>}
+
+          {row.kind === "project" && (
+            <span class="flex flex-wrap items-baseline gap-x-2">
+              <a
+                class:list={[row.color, "font-semibold underline-offset-2 hover:underline"]}
+                href={row.project.href}
+              >
+                {row.project.name}/
+              </a>
+              {row.project.private && <span class="text-xs text-overlay1">[private]</span>}
+            </span>
+          )}
+
+          {row.kind === "blurb" && <p class="text-subtext0">{row.text}</p>}
+
+
+          {row.kind === "links" && (
+            <p class="flex gap-4">
+              <a class="link-accent" href={row.href}>details &rarr;</a>
+              <a class="link-accent" href={row.github}>github</a>
+            </p>
+          )}
+
+          {row.kind === "file" && <span class="text-subtext1">{row.name}</span>}
+
+          {row.kind === "spacer" && <div class="h-3" />}
+        </div>
+      </div>
+    ))
+  }
+
+  <p class="mt-3 text-subtext0">{dirCount} directories, {fileCount} files</p>
+</div>

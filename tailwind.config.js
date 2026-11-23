@@ -1,8 +1,19 @@
+import defaultTheme from 'tailwindcss/defaultTheme';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
   theme: {
     extend: {
+      fontFamily: {
+        mono: ['"JetBrains Mono Variable"', ...defaultTheme.fontFamily.mono],
+      },
+      keyframes: {
+        blink: { '50%': { opacity: '0' } },
+      },
+      animation: {
+        blink: 'blink 1s step-end infinite',
+      },
       maxWidth: {
         content: "36rem",
       },
