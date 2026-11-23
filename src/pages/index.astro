@@ -1,33 +1,51 @@
 ---
 import Layout from "../layouts/layout.astro";
 import PageShell from "../components/PageShell.astro";
-import Links from "../components/index/s_links";
+import Prompt from "../components/Prompt.astro";
+import ProjectsList from "../components/ProjectsList.astro";
+
+const links = [
+  { label: "github", href: "https://github.com/marco-boone" },
+  { label: "linkedin", href: "https://www.linkedin.com/in/marcoboone04" },
+];
 ---
 
 <Layout title="Portfolio">
   <PageShell>
     <div class="flex flex-col gap-4">
-      <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-text">
-        hello, i'm marco
+      <Prompt command="cat about.md" />
+
+      <h1 class="flex flex-col gap-3 font-bold text-text">
+        <span class="font-normal text-overlay2">//<span class="bg-yellow text-crust">TODO</span>: insert greeting,</span>
+        <span class="text-[1rem] sm:text-lg"><span class="text-overlay2" aria-hidden="true"># </span>i'm marco</span>
       </h1>
 
-      <p class="text-subtext0">
-        21yo <span class="text-blue">computer engineering</span> student at
-        <span class="text-blue">U</span>of<span class="text-yellow">M</span>
-      </p>
+      <div class="flex flex-col gap-1">
+        <p class="text-subtext0">
+          21yo <span class="text-blue">computer engineering</span> student at
+          <span class="text-blue">U</span>of<span class="text-yellow">M</span>
+        </p>
+        <p class="text-subtext0">
+          incoming <span class="text-blue">swe</span> @ JPMC
+        </p>
+        <p class="text-subtext0">Ann Arbor, MI</p>
+      </div>
 
-      <p class="text-subtext0">
-        incoming <span class="text-blue">swe</span> @ JPMC
-      </p>
-
-      <p class="text-subtext0">Ann Arbor, MI</p>
-
-      <p class="text-subtext0">
-        I am interested in computer architecture, embedded systems, operating
-        systems, and math.
-      </p>
-
-      <Links client:load />
+      <ul class="flex flex-col gap-1">
+        {
+          links.map((l) => (
+            <li class="text-overlay2">
+              <span aria-hidden="true">- [</span><a class="link-accent" href={l.href}>{l.label}</a><span aria-hidden="true">](</span><span class="break-all">{l.href.replace(/^https:\/\/(www\.)?/, "").replace(/\/$/, "")}</span><span aria-hidden="true">)</span>
+            </li>
+          ))
+        }
+      </ul>
     </div>
+
+    <div id="projects" class="mt-12 scroll-mt-10">
+      <ProjectsList />
+    </div>
+
+    <Prompt class="mt-8" />
   </PageShell>
 </Layout>

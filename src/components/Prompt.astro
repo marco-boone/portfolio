@@ -1,0 +1,21 @@
+---
+// A shell prompt line: `~ $ <command>`. With no command, shows a blinking cursor.
+interface Props {
+  command?: string;
+  class?: string;
+}
+
+const { command, class: className = "" } = Astro.props;
+---
+
+<p class:list={["text-text", className]}>
+  <span class="text-green">~</span>
+  <span class="text-overlay2">$</span>
+  {
+    command ? (
+      <span>{command}</span>
+    ) : (
+      <span class="inline-block h-[1.1em] w-[1ch] translate-y-[0.15em] bg-text motion-safe:animate-blink" aria-hidden="true" />
+    )
+  }
+</p>
