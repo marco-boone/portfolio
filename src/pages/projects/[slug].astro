@@ -1,0 +1,17 @@
+---
+import { getCollection, render } from "astro:content";
+import ProjectPage from "../../layouts/ProjectPage.astro";
+import { mdxComponents } from "../../components/mdx-components";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  return projects.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<ProjectPage slug={entry.id} {...entry.data}>
+  <Content components={mdxComponents} />
+</ProjectPage>

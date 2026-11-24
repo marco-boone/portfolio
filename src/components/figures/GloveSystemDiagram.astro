@@ -1,0 +1,60 @@
+---
+// MiMU glove: STM32 and its peripherals, wires colored by bus.
+// Caption comes from the text between the tags in the .mdx file.
+// FILLER: swap in the real parts list and buses
+// Inputs on the left, outputs and storage on the right
+const peripherals = [
+  { name: "IMU", bus: "I2C", side: "left", row: 0 },
+  { name: "flex sensors", bus: "ADC", side: "left", row: 1 },
+  { name: "microphone", bus: "ADC", side: "left", row: 2 },
+  { name: "wireless", bus: "UART", side: "right", row: 0 },
+  { name: "SD card", bus: "SPI", side: "right", row: 1 },
+  { name: "speaker", bus: "DAC", side: "right", row: 2 },
+];
+const busColor: Record<string, string> = {
+  I2C: "stroke-mauve",
+  ADC: "stroke-teal",
+  UART: "stroke-yellow",
+  SPI: "stroke-blue",
+  DAC: "stroke-pink",
+};
+const busText: Record<string, string> = {
+  I2C: "fill-mauve",
+  ADC: "fill-teal",
+  UART: "fill-yellow",
+  SPI: "fill-blue",
+  DAC: "fill-pink",
+};
+const periW = 124;
+const periH = 46;
+const mcu = { x: 180, y: 92, w: 120, h: 70 };
+const periY = (r: number) => 20 + r * 84;
+---
+
+<figure>
+  <svg viewBox="0 0 480 270" class="w-full h-auto" role="img" aria-label="System diagram of the STM32 and its peripherals">
+    <text x="0" y="10" font-size="12" class="fill-subtext0">inputs</text>
+    <text x="480" y="10" font-size="12" text-anchor="end" class="fill-subtext0">outputs</text>
+    {
+      peripherals.map((p) => {
+        const x = p.side === "left" ? 0 : 480 - periW;
+        const y = periY(p.row);
+        const edgeX = p.side === "left" ? x + periW : x;
+        const mcuX = p.side === "left" ? mcu.x : mcu.x + mcu.w;
+        const mcuY = mcu.y + 17 + p.row * 18;
+        return (
+          <g>
+            <path d={`M${edgeX},${y + periH / 2} L${mcuX},${mcuY}`} fill="none" class={busColor[p.bus]} stroke-width="1.5" />
+            <rect x={x} y={y} width={periW} height={periH} rx="5" class="fill-surface0 stroke-overlay1" stroke-width="1.5" />
+            <text x={x + periW / 2} y={y + 20} text-anchor="middle" font-size="13" class="fill-text">{p.name}</text>
+            <text x={x + periW / 2} y={y + 36} text-anchor="middle" font-size="12" font-weight="bold" class={busText[p.bus]}>{p.bus}</text>
+          </g>
+        );
+      })
+    }
+    <rect x={mcu.x} y={mcu.y} width={mcu.w} height={mcu.h} rx="6" class="fill-blue/10 stroke-blue" stroke-width="2" />
+    <text x={mcu.x + mcu.w / 2} y={mcu.y + 31} text-anchor="middle" font-size="15" font-weight="bold" class="fill-text">STM32</text>
+    <text x={mcu.x + mcu.w / 2} y={mcu.y + 50} text-anchor="middle" font-size="12" class="fill-subtext0">Cortex-M4</text>
+  </svg>
+  {Astro.slots.has("default") && <figcaption><slot /></figcaption>}
+</figure>

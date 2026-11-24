@@ -1,0 +1,15 @@
+---
+// OoO CPU: die-portrait art piece, served from public/ooo-die/
+// Caption comes from the text between the tags in the .mdx file.
+---
+
+<figure>
+  <iframe
+    src="/ooo-die/index.html?embed"
+    title="Imagined die photograph of the out-of-order core"
+    loading="lazy"
+    class="w-full rounded border-0"
+    style="aspect-ratio: 1800 / 1240;"
+  ></iframe>
+  {Astro.slots.has("default") && <figcaption><slot /></figcaption>}
+</figure>

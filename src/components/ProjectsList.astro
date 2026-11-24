@@ -9,8 +9,8 @@ type Guide = "pipe" | "blank" | "tee" | "elbow";
 
 interface Project {
   name: string;
-  href: string;
-  github?: string;
+  details?: string; // on-site detail page
+  github?: string; // shown only for public projects
   private?: boolean;
   blurb?: string;
   files?: string[];
@@ -29,20 +29,19 @@ const tree: Category[] = [
     projects: [
       {
         name: "ooo-riscv-cpu",
-        href: "/projects/ooo-cpu",
-        github: "https://github.com/marco-boone/",
+        details: "/projects/ooo-cpu",
         private: true,
         blurb: "out-of-order RISC-V core in SystemVerilog",
       },
       {
         name: "mimu-glove",
-        href: "/projects/mimu-glove",
+        details: "/projects/mimu-glove",
         github: "https://github.com/marco-boone/373fp",
         blurb: "gesture-controlled audio glove on an STM32",
       },
       {
         name: "neural-network",
-        href: "/projects/neural-network",
+        details: "/projects/neural-network",
         github: "https://github.com/marcoboone/Atombots_Simulation_ML_GA",
         blurb: "from-scratch neural net in C#, trained by a genetic algorithm",
       },
@@ -54,14 +53,12 @@ const tree: Category[] = [
     projects: [
       {
         name: "lc2k-cpu",
-        href: "https://github.com/marco-boone/",
         private: true,
         blurb: "pipelined LC2K processor in SystemVerilog",
         files: [
           "out-of-order micro-op queue",
           "bimodal branch prediction with banked BTB",
           "direct-mapped I-cache",
-          "1.6 CPI, 18.9 ns per instruction",
         ],
       },
     ],
@@ -72,7 +69,7 @@ const tree: Category[] = [
     projects: [
       {
         name: "platformer",
-        href: "https://github.com/marco-boone/3DPrintingPlatformer",
+        github: "https://github.com/marco-boone/3DPrintingPlatformer",
         blurb: "Unity platformer about 3D printing",
       },
     ],
@@ -83,7 +80,6 @@ const tree: Category[] = [
     projects: [
       {
         name: "minventory",
-        href: "https://github.com/marco-boone/minventory",
         private: true,
         blurb: "spending tracker web app",
       },
@@ -93,9 +89,9 @@ const tree: Category[] = [
 
 type Row =
   | { kind: "category"; guides: Guide[]; dir: string }
-  | { kind: "project"; guides: Guide[]; project: Project; color: string; hasDetails: boolean }
+  | { kind: "project"; guides: Guide[]; project: Project; color: string }
   | { kind: "blurb"; guides: Guide[]; text: string }
-  | { kind: "links"; guides: Guide[]; href: string; github: string }
+  | { kind: "links"; guides: Guide[]; details?: string; github?: string }
   | { kind: "file"; guides: Guide[]; name: string }
   | { kind: "spacer"; guides: Guide[] };
 
@@ -111,13 +107,11 @@ tree.forEach((cat, ci) => {
 
   cat.projects.forEach((p, pi) => {
     const last = pi === cat.projects.length - 1;
-    const hasDetails = p.href.startsWith("/");
     rows.push({
       kind: "project",
       guides: [...catPrefix, last ? "elbow" : "tee"],
       project: p,
       color: cat.color,
-      hasDetails,
     });
     dirCount++;
 
@@ -126,8 +120,9 @@ tree.forEach((cat, ci) => {
     const infoGuides: Guide[] = [...own, files.length ? "pipe" : "blank"];
 
     if (p.blurb) rows.push({ kind: "blurb", guides: infoGuides, text: p.blurb });
-    if (hasDetails && p.github)
-      rows.push({ kind: "links", guides: infoGuides, href: p.href, github: p.github });
+    const github = p.private ? undefined : p.github;
+    if (p.details || github)
+      rows.push({ kind: "links", guides: infoGuides, details: p.details, github });
 
     files.forEach((f, fi) => {
       rows.push({
@@ -168,12 +163,7 @@ const arm = "absolute left-[0.5ch] top-[0.5lh] h-px w-[2.75ch] bg-overlay1";
 
           {row.kind === "project" && (
             <span class="flex flex-wrap items-baseline gap-x-2">
-              <a
-                class:list={[row.color, "font-semibold underline-offset-2 hover:underline"]}
-                href={row.project.href}
-              >
-                {row.project.name}/
-              </a>
+              <span class:list={[row.color, "font-semibold"]}>{row.project.name}/</span>
               {row.project.private && <span class="text-xs text-overlay1">[private]</span>}
             </span>
           )}
@@ -183,8 +173,8 @@ const arm = "absolute left-[0.5ch] top-[0.5lh] h-px w-[2.75ch] bg-overlay1";
 
           {row.kind === "links" && (
             <p class="flex gap-4">
-              <a class="link-accent" href={row.href}>details &rarr;</a>
-              <a class="link-accent" href={row.github}>github</a>
+              {row.details && <a class="link-accent" href={row.details}>details &rarr;</a>}
+              {row.github && <a class="link-accent" href={row.github}>github</a>}
             </p>
           )}
 

@@ -1,0 +1,73 @@
+---
+// OoO CPU: in-order vs out-of-order timeline after a cache miss.
+// Caption comes from the text between the tags in the .mdx file.
+// Cycle-by-cycle timeline. Each row: label, cycles spent waiting, then running.
+type Row = { label: string; wait: [number, number] | null; run: [number, number]; miss?: boolean };
+const inOrder: Row[] = [
+  { label: "lw  x1, 0(x9)", wait: null, run: [0, 8], miss: true },
+  { label: "add x2, x1, x3", wait: [1, 8], run: [8, 9] },
+  { label: "mul x4, x5, x6", wait: [2, 9], run: [9, 10] },
+  { label: "sub x7, x8, x6", wait: [3, 10], run: [10, 11] },
+];
+const outOfOrder: Row[] = [
+  { label: "lw  x1, 0(x9)", wait: null, run: [0, 8], miss: true },
+  { label: "add x2, x1, x3", wait: [1, 8], run: [8, 9] },
+  { label: "mul x4, x5, x6", wait: null, run: [1, 2] },
+  { label: "sub x7, x8, x6", wait: null, run: [2, 3] },
+];
+const cycleX = (c: number) => 150 + c * 27;
+const panels = [
+  { title: "in-order", result: "11 cycles", rows: inOrder, top: 0 },
+  { title: "out-of-order", result: "9 cycles", rows: outOfOrder, top: 122 },
+];
+---
+
+<figure>
+  <svg viewBox="0 0 480 268" class="w-full h-auto" role="img" aria-label="Timeline comparing in-order and out-of-order execution after a cache miss">
+    {
+      panels.map((panel) => (
+        <g>
+          <text x="0" y={panel.top + 14} font-size="13" class="fill-text" font-weight="bold">{panel.title}</text>
+          <text x="474" y={panel.top + 14} font-size="13" text-anchor="end" class="fill-subtext0">{panel.result}</text>
+          {panel.rows.map((row, r) => {
+            const y = panel.top + 28 + r * 22;
+            return (
+              <g>
+                <text x="0" y={y + 12} font-size="12" class="fill-subtext1">{row.label}</text>
+                <rect x={cycleX(0)} y={y} width={cycleX(12) - cycleX(0)} height="16" rx="3" class="fill-surface1/60" />
+                {row.wait && (
+                  <rect
+                    x={cycleX(row.wait[0]) + 1}
+                    y={y + 1}
+                    width={(row.wait[1] - row.wait[0]) * 27 - 2}
+                    height="14"
+                    rx="3"
+                    class="fill-yellow/15 stroke-yellow/60"
+                    stroke-dasharray="3 2"
+                  />
+                )}
+                <rect
+                  x={cycleX(row.run[0]) + 1}
+                  y={y}
+                  width={(row.run[1] - row.run[0]) * 27 - 2}
+                  height="16"
+                  rx="3"
+                  class={row.miss ? "fill-red/80" : "fill-blue"}
+                />
+              </g>
+            );
+          })}
+        </g>
+      ))
+    }
+    <g font-size="12">
+      <rect x="0" y="252" width="12" height="12" rx="2" class="fill-red/80" />
+      <text x="18" y="262" class="fill-subtext0">cache miss</text>
+      <rect x="130" y="252" width="12" height="12" rx="2" class="fill-blue" />
+      <text x="148" y="262" class="fill-subtext0">executing</text>
+      <rect x="250" y="252" width="12" height="12" rx="2" class="fill-yellow/15 stroke-yellow/60" stroke-dasharray="3 2" />
+      <text x="268" y="262" class="fill-subtext0">stalled</text>
+    </g>
+  </svg>
+  {Astro.slots.has("default") && <figcaption><slot /></figcaption>}
+</figure>

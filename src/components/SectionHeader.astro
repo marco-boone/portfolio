@@ -1,0 +1,17 @@
+---
+// A section divider styled like a terminal pane title: `01 about ────────`
+interface Props {
+  index: string;
+  title: string;
+  id?: string;
+  class?: string;
+}
+
+const { index, title, id, class: className = "" } = Astro.props;
+---
+
+<h2 id={id} class:list={["flex items-center gap-3 scroll-mt-10", className]}>
+  <span class="text-overlay1">{index}</span>
+  <span class="font-bold uppercase tracking-widest text-text">{title}</span>
+  <span class="h-px flex-1 bg-overlay0" aria-hidden="true"></span>
+</h2>

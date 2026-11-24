@@ -41,17 +41,59 @@
   animation: spin 3s linear infinite;
 }
 
-/* Project detail pages */
-.project-body h2 {
-  @apply section-label mb-3;
+/* Project detail pages (rendered from src/content/projects/*.mdx) */
+.project-body > * + * {
+  @apply mt-4;
 }
 
-.project-body p {
+.project-body > h2 {
+  @apply section-label mt-10 mb-3;
+}
+
+.project-body > h3 {
+  @apply mt-6 font-bold text-subtext1;
+}
+
+.project-body > figure,
+.project-body > dl {
+  @apply my-8;
+}
+
+.project-body > :first-child {
+  @apply mt-0;
+}
+
+.project-body p,
+.project-body li {
   @apply text-subtext0;
 }
 
-.project-body ul.bullets {
-  @apply text-subtext0 list-disc pl-5 flex flex-col gap-1;
+.project-body strong {
+  @apply text-subtext1;
+}
+
+.project-body a {
+  @apply link-accent;
+}
+
+.project-body ul {
+  @apply list-disc pl-5 flex flex-col gap-1;
+}
+
+.project-body ol {
+  @apply list-decimal pl-5 flex flex-col gap-1;
+}
+
+.project-body :not(pre) > code {
+  @apply rounded bg-surface0 px-1 text-subtext1;
+}
+
+.project-body blockquote {
+  @apply border-l-2 border-overlay0 pl-4;
+}
+
+.project-body img {
+  @apply w-full rounded;
 }
 
 .project-body figure {

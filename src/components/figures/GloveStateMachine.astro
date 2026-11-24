@@ -1,0 +1,47 @@
+---
+// MiMU glove: gesture state machine.
+// Caption comes from the text between the tags in the .mdx file.
+// FILLER: swap in the real gestures
+const states = [
+  { name: "recording", x: 0 },
+  { name: "idle", x: 180 },
+  { name: "playing", x: 360 },
+];
+---
+
+<figure>
+  <svg viewBox="0 0 480 130" class="w-full h-auto" role="img" aria-label="State machine for gesture control">
+    <defs>
+      <marker id="glove-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" class="fill-subtext0" />
+      </marker>
+    </defs>
+    {
+      states.map((s) => (
+        <g>
+          <rect
+            x={s.x}
+            y="42"
+            width="120"
+            height="46"
+            rx="23"
+            class={s.name === "idle" ? "fill-blue/10 stroke-blue" : "fill-surface0 stroke-overlay1"}
+            stroke-width="1.5"
+          />
+          <text x={s.x + 60} y="70" text-anchor="middle" font-size="13" class="fill-text">{s.name}</text>
+        </g>
+      ))
+    }
+    <g font-size="12" class="fill-yellow" text-anchor="middle">
+      <line x1="180" y1="56" x2="123" y2="56" class="stroke-subtext0" stroke-width="1.5" marker-end="url(#glove-arrow)" />
+      <text x="150" y="30">fist</text>
+      <line x1="120" y1="74" x2="177" y2="74" class="stroke-subtext0" stroke-width="1.5" marker-end="url(#glove-arrow)" />
+      <text x="150" y="110">open hand</text>
+      <line x1="300" y1="56" x2="357" y2="56" class="stroke-subtext0" stroke-width="1.5" marker-end="url(#glove-arrow)" />
+      <text x="330" y="30">swipe right</text>
+      <line x1="360" y1="74" x2="303" y2="74" class="stroke-subtext0" stroke-width="1.5" marker-end="url(#glove-arrow)" />
+      <text x="330" y="110">swipe left</text>
+    </g>
+  </svg>
+  {Astro.slots.has("default") && <figcaption><slot /></figcaption>}
+</figure>

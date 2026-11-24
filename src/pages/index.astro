@@ -3,6 +3,7 @@ import Layout from "../layouts/layout.astro";
 import PageShell from "../components/PageShell.astro";
 import Prompt from "../components/Prompt.astro";
 import ProjectsList from "../components/ProjectsList.astro";
+import SectionHeader from "../components/SectionHeader.astro";
 
 const links = [
   { label: "github", href: "https://github.com/marco-boone" },
@@ -12,12 +13,13 @@ const links = [
 
 <Layout title="Portfolio">
   <PageShell>
-    <div class="flex flex-col gap-4">
+    <section class="flex flex-col gap-5" aria-labelledby="about">
+      <SectionHeader index="01" title="about" id="about" />
       <Prompt command="cat about.md" />
 
-      <h1 class="flex flex-col gap-3 font-bold text-text">
-        <span class="font-normal text-overlay2">//<span class="bg-yellow text-crust">TODO</span>: insert greeting,</span>
-        <span class="text-[1rem] sm:text-lg"><span class="text-overlay2" aria-hidden="true"># </span>i'm marco</span>
+      <h1 class="flex flex-col gap-1">
+        <span class="text-overlay2">//<span class="bg-yellow text-crust">TODO</span>: insert greeting,</span>
+        <span class="text-xl font-bold text-text sm:text-2xl">i'm marco</span>
       </h1>
 
       <div class="flex flex-col gap-1">
@@ -40,12 +42,13 @@ const links = [
           ))
         }
       </ul>
-    </div>
+    </section>
 
-    <div id="projects" class="mt-12 scroll-mt-10">
+    <section class="mt-14 flex flex-col gap-5" aria-labelledby="projects">
+      <SectionHeader index="02" title="projects" id="projects" />
       <ProjectsList />
-    </div>
+    </section>
 
-    <Prompt class="mt-8" />
+    <Prompt class="mt-10" />
   </PageShell>
 </Layout>

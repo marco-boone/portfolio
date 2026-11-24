@@ -1,0 +1,43 @@
+---
+title: MiMU Glove
+tagline: A wireless glove that records and plays back audio with hand gestures. Bare-metal C on an STM32 (Cortex-M4), built for EECS 373.
+tags: [C, STM32, Cortex-M4, bare metal, EECS 373]
+links:
+  - { label: github, href: "https://github.com/marco-boone/373fp" }
+---
+
+{/* FILLER: swap in the real numbers */}
+<StatGrid
+  stats={[
+    { value: "0", label: "RTOS" },
+    { value: "6+", label: "peripherals" },
+    { value: "3", label: "buses" },
+    { value: "<20 ms", label: "gesture latency" },
+  ]}
+/>
+
+## Overview
+
+The glove reads hand motion and finger bends, recognizes gestures, and uses them to control audio: start a recording, play it back, or stop. Everything runs bare metal with no RTOS, so all peripheral timing is handled with interrupts and DMA.
+
+<Fig todo="photo of the glove" />
+
+<GloveSystemDiagram>The STM32 talks to each part directly. Each wire is colored by its bus: I2C, ADC, UART, SPI, or DAC.</GloveSystemDiagram>
+
+## Gesture control
+
+Sensor reads are triggered by a timer interrupt. Each sample is checked against simple thresholds, and a small state machine turns gestures into actions.
+
+<GloveStateMachine>How gestures move the glove between idle, recording, and playback.</GloveStateMachine>
+
+## Key features
+
+- No RTOS: 6+ peripherals over SPI, I2C, and UART, all in bare-metal C
+- Interrupt-driven gesture recognition
+- DMA for audio sampling so the CPU stays free for gesture processing {/* FILLER */}
+- Recordings saved to an SD card {/* FILLER */}
+
+## What I learned
+
+{/* FILLER */}
+Without an RTOS, every timing decision is yours. I learned to set interrupt priorities carefully, keep handlers short, and read datasheets closely to get each peripheral working.
