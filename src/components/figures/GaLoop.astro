@@ -1,12 +1,12 @@
 ---
 // Neural network: genetic algorithm training loop.
 // Caption comes from the text between the tags in the .mdx file.
-// FILLER: swap in the real population size
+// Steps from SwarmGenerator.cs and Storage.cs.
 const gaSteps = [
-  { name: "spawn", detail: "50 robots" },
-  { name: "simulate", detail: "run in Unity" },
-  { name: "score", detail: "fitness" },
-  { name: "evolve", detail: "select, mutate" },
+  { name: "spawn", detail: "mutated best" },
+  { name: "simulate", detail: "until all die" },
+  { name: "score", detail: "time alive" },
+  { name: "evolve", detail: "average top 2" },
 ];
 const stepW = 105;
 const stepX = (i: number) => i * (stepW + 20);

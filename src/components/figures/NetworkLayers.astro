@@ -1,15 +1,15 @@
 ---
 // Neural network: input, hidden, and output layers.
 // Caption comes from the text between the tags in the .mdx file.
-// FILLER: swap in the real network shape and inputs
+// Shape (7-5-4) and inputs/outputs from Automaton.cs and the Automaton prefab.
 const layers = [
-  { name: "input", x: 110, color: "blue", labels: ["sensor 1", "sensor 2", "sensor 3", "sensor 4", "heading"] },
-  { name: "hidden", x: 245, color: "mauve", labels: ["", "", "", "", "", ""] },
-  { name: "output", x: 380, color: "teal", labels: ["left motor", "right motor"] },
+  { name: "input", x: 120, color: "blue", labels: ["velocity x", "velocity y", "wall ray 1 x", "wall ray 1 y", "wall ray 2 x", "wall ray 2 y", "# nearby"] },
+  { name: "hidden", x: 245, color: "mauve", labels: ["", "", "", "", ""] },
+  { name: "output", x: 370, color: "teal", labels: ["alignment", "cohesion", "separation", "heading"] },
 ];
 const nodeFill: Record<string, string> = { blue: "fill-blue/20 stroke-blue", mauve: "fill-mauve/20 stroke-mauve", teal: "fill-teal/20 stroke-teal" };
 const nodeText: Record<string, string> = { blue: "fill-blue", mauve: "fill-mauve", teal: "fill-teal" };
-const height = 220;
+const height = 250;
 const nodeY = (count: number, i: number) => 34 + ((height - 44) / count) * (i + 0.5);
 ---
 

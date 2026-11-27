@@ -55,7 +55,8 @@
 }
 
 .project-body > figure,
-.project-body > dl {
+.project-body > dl,
+.project-body > table {
   @apply my-8;
 }
 
@@ -97,7 +98,36 @@
 }
 
 .project-body figure {
-  @apply flex flex-col gap-3 rounded-md border border-overlay0 bg-surface0/60 p-3 sm:p-4;
+  @apply flex flex-col gap-3;
+}
+
+/* Key/value results, e.g. clock period, CPI */
+.project-body dl {
+  @apply grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 border-l-2 border-overlay0 pl-4;
+}
+
+.project-body dt {
+  @apply text-subtext0;
+}
+
+.project-body dd {
+  @apply font-semibold text-text;
+}
+
+.project-body dd .note {
+  @apply ml-2 font-normal text-overlay2 text-xs;
+}
+
+.project-body table {
+  @apply w-full text-left text-xs;
+}
+
+.project-body th {
+  @apply border-b border-overlay0 py-1.5 pr-3 font-semibold text-subtext1;
+}
+
+.project-body td {
+  @apply border-b border-surface0 py-1.5 pr-3 text-subtext0 align-top;
 }
 
 .project-body figcaption {

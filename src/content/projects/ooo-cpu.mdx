@@ -1,49 +1,30 @@
 ---
 title: OoO RISC-V CPU
-tagline: A 2-wide superscalar, out-of-order RISC-V core in SystemVerilog, built in the style of the MIPS R10K. EECS 472 team project with Niki Lin, Shaoqian Zhou, and Sophia Chen.
-tags: [SystemVerilog, RISC-V, R10K, EECS 472]
-links:
-  - { label: slide deck, href: "/mde_slides" }
+tagline: A 2-wide superscalar, out-of-order RISC-V core in SystemVerilog, built in the style of the MIPS R10K.
+team: EECS 472 w/ Niki Lin, Shaoqian Zhou, and Sophia Chen
+timeline: Fall 2026
+github: private
 ---
 
-{/* FILLER: swap in final numbers once the CPU is done */}
-<StatGrid
-  stats={[
-    { value: "2-wide", label: "superscalar" },
-    { value: "32", label: "ROB entries" },
-    { value: "16", label: "RS entries" },
-    { value: "~1.0", label: "target CPI" },
-  ]}
-/>
+## CONTEXT
 
-## The problem
+This processor design was completed for my *capstone* project. A successful project meant designing, building, and  synthesizing a sufficently performant OoO (out-of-order) processor. 
 
-In a simple in-order pipeline, one slow load (like a cache miss) stalls every instruction behind it, even ones that don't depend on it. An out-of-order core runs ready instructions early and commits them in program order, so the program still behaves correctly.
+## DESIGN
 
-<OooTimeline>One load misses in the cache. In order, the independent `mul` and `sub` stall behind it. Out of order, they run during the miss and the program finishes 2 cycles sooner.</OooTimeline>
+The core was inspired by the MIPS-R10K architecture, and thus we conceptually split our core into a front, middle, and back end such that the middle end housed the canon structures found in the R10K.
 
-## Architecture
+<OooPipeline>condensed high level diagram - instructions flow top to bottom then left to right</OooPipeline>
 
-The core is split into a front end that fetches and decodes, a middle that renames registers and tracks instructions, and a back end that executes them and commits results in order.
+## Results
 
-<OooPipeline>Instructions flow down each column, left to right. Finished results are broadcast on the common data bus (CDB), which wakes up instructions waiting in the reservation stations.</OooPipeline>
-
-<OooDie>The same core drawn as an imagined die photograph. Hover over a block to see what it does. [Open full size](/ooo-die/index.html)</OooDie>
-
-## Key features
-
-{/* FILLER: confirm against the final design */}
-- Register renaming with a map table and free list, R10K-style
-- Reorder buffer (ROB) for in-order commit and precise exceptions
-- Reservation stations that issue instructions as soon as their operands are ready
-- Branch prediction with a BTB, and recovery on a mispredict
-- Load/store queue for memory ordering
-
-## My role
-
-{/* FILLER: describe what you personally built */}
-I designed and verified the reorder buffer and the rename logic, and helped integrate the middle of the core with the front and back ends.
-
-## Process
-
-We agreed on interfaces first, then built each module in small, tested pieces and integrated them one feature at a time. The goal was a working core by Oct 29 and the full CPU by Nov 20.
+<dl>
+  <dt>clock period</dt>
+  <dd>1.70 ns <span class="note">≈ 588 MHz</span></dd>
+  <dt>CPI</dt>
+  <dd>1.10</dd>
+  <dt>TPI</dt>
+  <dd>1.87 ns <span class="note">= 1.10 CPI × 1.70 ns</span></dd>
+  <dt>process</dt>
+  <dd>//todo</dd>
+</dl>

@@ -1,60 +1,86 @@
 ---
-// MiMU glove: STM32 and its peripherals, wires colored by bus.
+// MiMU glove: the glove and the board, linked by a pair of ESP32s.
+// Wires are colored by bus. Parts come from the 373fp repo README.
 // Caption comes from the text between the tags in the .mdx file.
-// FILLER: swap in the real parts list and buses
-// Inputs on the left, outputs and storage on the right
-const peripherals = [
-  { name: "IMU", bus: "I2C", side: "left", row: 0 },
-  { name: "flex sensors", bus: "ADC", side: "left", row: 1 },
-  { name: "microphone", bus: "ADC", side: "left", row: 2 },
-  { name: "wireless", bus: "UART", side: "right", row: 0 },
-  { name: "SD card", bus: "SPI", side: "right", row: 1 },
-  { name: "speaker", bus: "DAC", side: "right", row: 2 },
-];
 const busColor: Record<string, string> = {
-  I2C: "stroke-mauve",
   ADC: "stroke-teal",
+  I2C: "stroke-mauve",
   UART: "stroke-yellow",
   SPI: "stroke-blue",
+  I2S: "stroke-peach",
   DAC: "stroke-pink",
 };
 const busText: Record<string, string> = {
-  I2C: "fill-mauve",
   ADC: "fill-teal",
+  I2C: "fill-mauve",
   UART: "fill-yellow",
   SPI: "fill-blue",
+  I2S: "fill-peach",
   DAC: "fill-pink",
 };
-const periW = 124;
-const periH = 46;
-const mcu = { x: 180, y: 92, w: 120, h: 70 };
-const periY = (r: number) => 20 + r * 84;
+
+const partW = 124;
+const partH = 40;
+const espX = 480 - 92;
+const espW = 92;
+
+const glove = {
+  mcu: { x: 170, y: 36, w: 130, h: 64, name: "STM32L432", detail: "Cortex-M4" },
+  parts: [
+    { name: "flex + force", bus: "ADC", y: 30 },
+    { name: "accelerometer", bus: "I2C", y: 78 },
+  ],
+  espY: 48,
+};
+const board = {
+  mcu: { x: 170, y: 203, w: 130, h: 64, name: "STM32L4R5", detail: "Cortex-M4" },
+  parts: [
+    { name: "microphone", bus: "I2S", y: 172 },
+    { name: "SD card", bus: "SPI", y: 218 },
+    { name: "audio jack", bus: "DAC", y: 264 },
+  ],
+  espY: 215,
+};
+const sections = [
+  { label: "glove", labelY: 12, ...glove },
+  { label: "board", labelY: 160, ...board },
+];
 ---
 
 <figure>
-  <svg viewBox="0 0 480 270" class="w-full h-auto" role="img" aria-label="System diagram of the STM32 and its peripherals">
-    <text x="0" y="10" font-size="12" class="fill-subtext0">inputs</text>
-    <text x="480" y="10" font-size="12" text-anchor="end" class="fill-subtext0">outputs</text>
+  <svg viewBox="0 0 480 310" class="w-full h-auto" role="img" aria-label="System diagram: the glove's STM32 reads its sensors and sends commands over ESP32 to the board's STM32, which handles the microphone, SD card, and audio jack">
     {
-      peripherals.map((p) => {
-        const x = p.side === "left" ? 0 : 480 - periW;
-        const y = periY(p.row);
-        const edgeX = p.side === "left" ? x + periW : x;
-        const mcuX = p.side === "left" ? mcu.x : mcu.x + mcu.w;
-        const mcuY = mcu.y + 17 + p.row * 18;
+      sections.map((s) => {
+        const m = s.mcu;
         return (
           <g>
-            <path d={`M${edgeX},${y + periH / 2} L${mcuX},${mcuY}`} fill="none" class={busColor[p.bus]} stroke-width="1.5" />
-            <rect x={x} y={y} width={periW} height={periH} rx="5" class="fill-surface0 stroke-overlay1" stroke-width="1.5" />
-            <text x={x + periW / 2} y={y + 20} text-anchor="middle" font-size="13" class="fill-text">{p.name}</text>
-            <text x={x + periW / 2} y={y + 36} text-anchor="middle" font-size="12" font-weight="bold" class={busText[p.bus]}>{p.bus}</text>
+            <text x="0" y={s.labelY} font-size="12" font-weight="bold" class="fill-subtext0">{s.label}</text>
+            {s.parts.map((p, i) => {
+              const midY = p.y + partH / 2;
+              const mcuY = m.y + ((i + 1) * m.h) / (s.parts.length + 1);
+              return (
+                <g>
+                  <path d={`M${partW},${midY} L${m.x},${mcuY}`} fill="none" class={busColor[p.bus]} stroke-width="1.5" />
+                  <rect x="0" y={p.y} width={partW} height={partH} rx="5" class="fill-surface0 stroke-overlay1" stroke-width="1.5" />
+                  <text x={partW / 2} y={p.y + 17} text-anchor="middle" font-size="12" class="fill-text">{p.name}</text>
+                  <text x={partW / 2} y={p.y + 32} text-anchor="middle" font-size="11" font-weight="bold" class={busText[p.bus]}>{p.bus}</text>
+                </g>
+              );
+            })}
+            <path d={`M${m.x + m.w},${s.espY + partH / 2} L${espX},${s.espY + partH / 2}`} fill="none" class={busColor.UART} stroke-width="1.5" />
+            <rect x={m.x} y={m.y} width={m.w} height={m.h} rx="6" class="fill-blue/10 stroke-blue" stroke-width="2" />
+            <text x={m.x + m.w / 2} y={m.y + 28} text-anchor="middle" font-size="14" font-weight="bold" class="fill-text">{m.name}</text>
+            <text x={m.x + m.w / 2} y={m.y + 46} text-anchor="middle" font-size="11" class="fill-subtext0">{m.detail}</text>
+            <rect x={espX} y={s.espY} width={espW} height={partH} rx="5" class="fill-surface0 stroke-overlay1" stroke-width="1.5" />
+            <text x={espX + espW / 2} y={s.espY + 17} text-anchor="middle" font-size="12" class="fill-text">ESP32</text>
+            <text x={espX + espW / 2} y={s.espY + 32} text-anchor="middle" font-size="11" font-weight="bold" class={busText.UART}>UART</text>
           </g>
         );
       })
     }
-    <rect x={mcu.x} y={mcu.y} width={mcu.w} height={mcu.h} rx="6" class="fill-blue/10 stroke-blue" stroke-width="2" />
-    <text x={mcu.x + mcu.w / 2} y={mcu.y + 31} text-anchor="middle" font-size="15" font-weight="bold" class="fill-text">STM32</text>
-    <text x={mcu.x + mcu.w / 2} y={mcu.y + 50} text-anchor="middle" font-size="12" class="fill-subtext0">Cortex-M4</text>
+    <!-- wireless link between the two ESP32s -->
+    <path d={`M${espX + espW / 2},${glove.espY + partH + 2} V${board.espY - 2}`} fill="none" class="stroke-subtext0" stroke-width="1.5" stroke-dasharray="4 3" />
+    <text x={espX - 8} y={(glove.espY + partH + board.espY) / 2 + 4} text-anchor="end" font-size="11" class="fill-subtext0">wireless</text>
   </svg>
   {Astro.slots.has("default") && <figcaption><slot /></figcaption>}
 </figure>

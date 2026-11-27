@@ -117,7 +117,7 @@ tree.forEach((cat, ci) => {
 
     const own: Guide[] = [...catPrefix, last ? "blank" : "pipe"];
     const files = p.files ?? [];
-    const infoGuides: Guide[] = [...own, files.length ? "pipe" : "blank"];
+    const infoGuides: Guide[] = [...own, "blank"];
 
     if (p.blurb) rows.push({ kind: "blurb", guides: infoGuides, text: p.blurb });
     const github = p.private ? undefined : p.github;
@@ -127,7 +127,7 @@ tree.forEach((cat, ci) => {
     files.forEach((f, fi) => {
       rows.push({
         kind: "file",
-        guides: [...own, fi === files.length - 1 ? "elbow" : "tee"],
+        guides: [...own, "blank"],
         name: f,
       });
       fileCount++;
